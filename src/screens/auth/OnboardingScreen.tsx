@@ -5,6 +5,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Shield, Zap, CheckCircle, Target, Trophy, Clock, ChevronRight } from 'lucide-react-native';
 import { theme } from '../../constants/theme';
+import { scale, verticalScale, fontSize as fs } from '../../utils/responsive';
 import { Button } from '../../components/ui/Button';
 import { GlowInput } from '../../components/ui/GlowInput';
 import { HudContainer } from '../../components/ui/HudContainer';
@@ -12,16 +13,16 @@ import { useAuthContext } from '../../context/AuthContext';
 import { saveOnboardingData } from '../../services/profileService';
 
 const FEATURES = [
-  { icon: <Zap color={theme.colors.primary} size={20} />, title: 'Gamified Fitness', desc: 'Level up your real-life stats through daily quests' },
-  { icon: <Shield color={theme.colors.secondary} size={20} />, title: 'Complete Tracking', desc: 'Workouts, sleep, screen time — all in one place' },
-  { icon: <CheckCircle color={theme.colors.success} size={20} />, title: 'Achievement System', desc: 'Unlock badges and climb the leaderboards' },
+  { icon: <Zap color={theme.colors.primary} size={theme.iconSizes.xxl} />, title: 'Gamified Fitness', desc: 'Level up your real-life stats through daily quests' },
+  { icon: <Shield color={theme.colors.secondary} size={theme.iconSizes.xxl} />, title: 'Complete Tracking', desc: 'Workouts, sleep, screen time — all in one place' },
+  { icon: <CheckCircle color={theme.colors.success} size={theme.iconSizes.xxl} />, title: 'Achievement System', desc: 'Unlock badges and climb the leaderboards' },
 ];
 
 const GOALS = [
-  { id: 'weight_loss', label: 'Weight Loss', icon: <Target color={theme.colors.primary} size={16} />, desc: 'Burn calories and shed excess weight' },
-  { id: 'muscle_gain', label: 'Muscle Gain', icon: <Trophy color={theme.colors.primary} size={16} />, desc: 'Build strength and increase muscle mass' },
-  { id: 'maintenance', label: 'Maintenance', icon: <Shield color={theme.colors.primary} size={16} />, desc: 'Maintain current fitness level' },
-  { id: 'endurance', label: 'Endurance', icon: <Zap color={theme.colors.primary} size={16} />, desc: 'Improve stamina and cardiovascular health' },
+  { id: 'weight_loss', label: 'Weight Loss', icon: <Target color={theme.colors.primary} size={theme.iconSizes.xl} />, desc: 'Burn calories and shed excess weight' },
+  { id: 'muscle_gain', label: 'Muscle Gain', icon: <Trophy color={theme.colors.primary} size={theme.iconSizes.xl} />, desc: 'Build strength and increase muscle mass' },
+  { id: 'maintenance', label: 'Maintenance', icon: <Shield color={theme.colors.primary} size={theme.iconSizes.xl} />, desc: 'Maintain current fitness level' },
+  { id: 'endurance', label: 'Endurance', icon: <Zap color={theme.colors.primary} size={theme.iconSizes.xl} />, desc: 'Improve stamina and cardiovascular health' },
 ];
 
 const FITNESS_LEVELS = [
@@ -244,7 +245,7 @@ export function OnboardingScreen() {
                     <Text style={styles.optionLabel}>{goal.label}</Text>
                     <Text style={styles.optionDesc}>{goal.desc}</Text>
                     {selectedGoals.includes(goal.id) && (
-                      <CheckCircle color={theme.colors.primary} size={16} style={styles.checkIcon} />
+                      <CheckCircle color={theme.colors.primary} size={theme.iconSizes.xl} style={styles.checkIcon} />
                     )}
                   </TouchableOpacity>
                 ))}
@@ -271,7 +272,7 @@ export function OnboardingScreen() {
                       <Text style={styles.levelLabel}>{level.label}</Text>
                       <Text style={styles.levelDesc}>{level.desc}</Text>
                     </View>
-                    {fitnessLevel === level.id && <CheckCircle color={theme.colors.primary} size={20} />}
+                    {fitnessLevel === level.id && <CheckCircle color={theme.colors.primary} size={theme.iconSizes.xxl} />}
                   </TouchableOpacity>
                 ))}
               </View>
@@ -401,9 +402,9 @@ export function OnboardingScreen() {
                         ]);
                       }}
                     >
-                      <Clock color={theme.colors.primary} size={20} />
+                      <Clock color={theme.colors.primary} size={theme.iconSizes.xxl} />
                       <Text style={styles.timePickerText}>{reminderTime}</Text>
-                      <ChevronRight color={theme.colors.textDimmed} size={16} />
+                      <ChevronRight color={theme.colors.textDimmed} size={theme.iconSizes.xl} />
                     </TouchableOpacity>
                   </View>
                 )}
@@ -440,7 +441,7 @@ export function OnboardingScreen() {
 
       <View style={styles.content}>
         <View style={styles.badge}>
-          <Shield color={theme.colors.primary} size={36} />
+          <Shield color={theme.colors.primary} size={theme.iconSizes.huge} />
         </View>
 
         <View style={styles.progressContainer}>
@@ -476,28 +477,28 @@ export function OnboardingScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.bg.base },
-  corner: { position: 'absolute', width: 22, height: 22, borderColor: theme.colors.primary, opacity: 0.5 },
-  cTL: { top: 22, left: 22, borderTopWidth: 2, borderLeftWidth: 2 },
-  cTR: { top: 22, right: 22, borderTopWidth: 2, borderRightWidth: 2 },
-  cBL: { bottom: 22, left: 22, borderBottomWidth: 2, borderLeftWidth: 2 },
-  cBR: { bottom: 22, right: 22, borderBottomWidth: 2, borderRightWidth: 2 },
+  corner: { position: 'absolute', width: scale(22), height: scale(22), borderColor: theme.colors.primary, opacity: 0.5 },
+  cTL: { top: scale(22), left: scale(22), borderTopWidth: 2, borderLeftWidth: 2 },
+  cTR: { top: scale(22), right: scale(22), borderTopWidth: 2, borderRightWidth: 2 },
+  cBL: { bottom: scale(22), left: scale(22), borderBottomWidth: 2, borderLeftWidth: 2 },
+  cBR: { bottom: scale(22), right: scale(22), borderBottomWidth: 2, borderRightWidth: 2 },
   content: { flex: 1, padding: theme.spacing.lg, justifyContent: 'space-between' },
   badge: {
-    width: 80, height: 80, borderRadius: 20,
+    width: scale(80), height: scale(80), borderRadius: scale(20),
     backgroundColor: theme.colors.bg.glass, borderWidth: 1, borderColor: theme.colors.primary,
     justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: theme.spacing.lg,
     ...theme.glow.cyan,
   },
   progressContainer: { alignItems: 'center', marginBottom: theme.spacing.md },
-  progressText: { fontSize: 10, color: theme.colors.text.secondary, letterSpacing: 2, marginBottom: theme.spacing.xs },
-  progressBar: { width: 120, height: 3, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 2 },
-  progressFill: { height: '100%', backgroundColor: theme.colors.primary, borderRadius: 2 },
+  progressText: { fontSize: fs(10), color: theme.colors.text.secondary, letterSpacing: 2, marginBottom: theme.spacing.xs },
+  progressBar: { width: scale(120), height: verticalScale(3), backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: scale(2) },
+  progressFill: { height: '100%', backgroundColor: theme.colors.primary, borderRadius: scale(2) },
   stepContainer: { flex: 1, justifyContent: 'center' },
   stepContent: { flex: 1 },
-  stepTitle: { fontSize: 24, fontWeight: '900', color: theme.colors.primary, letterSpacing: 3, textAlign: 'center', marginBottom: theme.spacing.sm, fontFamily: theme.fonts.heading },
-  stepSubtitle: { fontSize: 14, color: theme.colors.text.secondary, textAlign: 'center', lineHeight: 22, marginBottom: theme.spacing.md },
+  stepTitle: { fontSize: fs(24), fontWeight: '900', color: theme.colors.primary, letterSpacing: 3, textAlign: 'center', marginBottom: theme.spacing.sm, fontFamily: theme.fonts.heading },
+  stepSubtitle: { fontSize: fs(14), color: theme.colors.text.secondary, textAlign: 'center', lineHeight: fs(22), marginBottom: theme.spacing.md },
   optionsContainer: { flex: 1 },
-  sectionTitle: { fontSize: 12, color: theme.colors.secondary, letterSpacing: 2, marginBottom: theme.spacing.sm },
+  sectionTitle: { fontSize: fs(12), color: theme.colors.secondary, letterSpacing: 2, marginBottom: theme.spacing.sm },
   optionsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: theme.spacing.sm },
   optionsList: { gap: theme.spacing.sm },
   optionCard: {
@@ -506,11 +507,11 @@ const styles = StyleSheet.create({
   },
   optionCardSelected: { borderColor: theme.colors.primary, backgroundColor: theme.colors.primary + '15' },
   optionIcon: {
-    width: 40, height: 40, borderRadius: 10,
+    width: scale(40), height: scale(40), borderRadius: scale(10),
     backgroundColor: theme.colors.bg.base, justifyContent: 'center', alignItems: 'center', marginBottom: theme.spacing.xs,
   },
-  optionLabel: { fontSize: 12, fontWeight: '700', color: theme.colors.text.primary, textAlign: 'center', marginBottom: 2 },
-  optionDesc: { fontSize: 10, color: theme.colors.text.secondary, textAlign: 'center', lineHeight: 14 },
+  optionLabel: { fontSize: fs(12), fontWeight: '700', color: theme.colors.text.primary, textAlign: 'center', marginBottom: verticalScale(2) },
+  optionDesc: { fontSize: fs(10), color: theme.colors.text.secondary, textAlign: 'center', lineHeight: fs(14) },
   levelOption: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     backgroundColor: theme.colors.bg.glass, borderWidth: 1, borderColor: theme.colors.bg.glassBorder,
@@ -518,22 +519,22 @@ const styles = StyleSheet.create({
   },
   levelOptionSelected: { borderColor: theme.colors.primary, backgroundColor: theme.colors.primary + '15' },
   levelContent: { flex: 1 },
-  levelLabel: { fontSize: 14, fontWeight: '700', color: theme.colors.text.primary, marginBottom: 2 },
-  levelDesc: { fontSize: 12, color: theme.colors.text.secondary },
+  levelLabel: { fontSize: fs(14), fontWeight: '700', color: theme.colors.text.primary, marginBottom: verticalScale(2) },
+  levelDesc: { fontSize: fs(12), color: theme.colors.text.secondary },
   toggle: {
-    width: 40, height: 20, borderRadius: 10,
+    width: scale(40), height: verticalScale(20), borderRadius: scale(10),
     backgroundColor: theme.colors.bg.glassBorder, justifyContent: 'center', alignItems: 'center',
   },
   toggleOn: { backgroundColor: theme.colors.primary },
-  toggleText: { fontSize: 8, fontWeight: '700', color: theme.colors.text.primary },
+  toggleText: { fontSize: fs(8), fontWeight: '700', color: theme.colors.text.primary },
   unitRow: { flexDirection: 'row', alignItems: 'flex-end', gap: theme.spacing.sm, marginTop: theme.spacing.sm },
-  unitToggleGroup: { flexDirection: 'row', gap: 4, paddingBottom: theme.spacing.md },
+  unitToggleGroup: { flexDirection: 'row', gap: scale(4), paddingBottom: theme.spacing.md },
   unitChip: {
-    paddingHorizontal: 10, paddingVertical: 6,
-    borderWidth: 1, borderColor: theme.colors.bg.glassBorder, borderRadius: 4,
+    paddingHorizontal: scale(10), paddingVertical: verticalScale(6),
+    borderWidth: 1, borderColor: theme.colors.bg.glassBorder, borderRadius: scale(4),
   },
   unitChipActive: { borderColor: theme.colors.primary, backgroundColor: theme.colors.primary + '15' },
-  unitChipText: { fontSize: 10, fontWeight: '700', color: theme.colors.text.secondary },
+  unitChipText: { fontSize: fs(10), fontWeight: '700', color: theme.colors.text.secondary },
   unitChipTextActive: { color: theme.colors.primary },
   genderRow: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm, marginBottom: theme.spacing.lg },
   genderChip: {
@@ -541,12 +542,12 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: theme.colors.bg.glassBorder, borderRadius: theme.border.radius.md,
   },
   genderChipActive: { borderColor: theme.colors.primary, backgroundColor: theme.colors.primary + '15' },
-  genderChipText: { fontSize: 11, fontWeight: '600', color: theme.colors.text.secondary },
+  genderChipText: { fontSize: fs(11), fontWeight: '600', color: theme.colors.text.secondary },
   genderChipTextActive: { color: theme.colors.primary },
   navigationContainer: { flexDirection: 'row', gap: theme.spacing.md, marginTop: theme.spacing.lg, zIndex: 10 },
-  previousButton: { flex: 1 },
-  nextButton: { flex: 2 },
-  divider: { width: 50, height: 1.5, backgroundColor: theme.colors.primary, marginVertical: theme.spacing.lg, opacity: 0.5, alignSelf: 'center' },
+  previousButton: { flex: 1, minWidth: scale(100) },
+  nextButton: { flex: 2, minWidth: scale(120) },
+  divider: { width: scale(50), height: verticalScale(1.5), backgroundColor: theme.colors.primary, marginVertical: theme.spacing.lg, opacity: 0.5, alignSelf: 'center' },
   featureList: { alignSelf: 'stretch', gap: theme.spacing.md },
   featureRow: {
     flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md,
@@ -554,20 +555,20 @@ const styles = StyleSheet.create({
     borderRadius: theme.border.radius.md, padding: theme.spacing.md,
   },
   featureIcon: {
-    width: 44, height: 44, borderRadius: 12,
+    width: scale(44), height: scale(44), borderRadius: scale(12),
     backgroundColor: theme.colors.bg.base, justifyContent: 'center', alignItems: 'center',
   },
   featureText: { flex: 1 },
-  featureTitle: { fontSize: 14, fontWeight: '700', color: theme.colors.text.primary, marginBottom: 2 },
-  featureDesc: { fontSize: 12, color: theme.colors.text.secondary },
-  accountNote: { fontSize: 12, color: theme.colors.text.secondary, marginBottom: theme.spacing.md, textAlign: 'center' },
-  hint: { fontSize: 11, color: theme.colors.text.secondary + '80', textAlign: 'center', marginTop: theme.spacing.sm },
-  checkIcon: { position: 'absolute', top: 8, right: 8 },
+  featureTitle: { fontSize: fs(14), fontWeight: '700', color: theme.colors.text.primary, marginBottom: verticalScale(2) },
+  featureDesc: { fontSize: fs(12), color: theme.colors.text.secondary },
+  accountNote: { fontSize: fs(12), color: theme.colors.text.secondary, marginBottom: theme.spacing.md, textAlign: 'center' },
+  hint: { fontSize: fs(11), color: theme.colors.text.secondary + '80', textAlign: 'center', marginTop: theme.spacing.sm },
+  checkIcon: { position: 'absolute', top: scale(8), right: scale(8) },
   timePickerContainer: { marginTop: theme.spacing.md, marginBottom: theme.spacing.md },
   timePickerButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     backgroundColor: theme.colors.bg.glass, borderWidth: 1, borderColor: theme.colors.bg.glassBorder,
     borderRadius: theme.border.radius.md, padding: theme.spacing.md,
   },
-  timePickerText: { fontSize: 16, fontWeight: '700', color: theme.colors.text.primary },
+  timePickerText: { fontSize: fs(16), fontWeight: '700', color: theme.colors.text.primary },
 });

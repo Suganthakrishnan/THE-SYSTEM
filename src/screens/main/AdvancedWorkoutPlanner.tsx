@@ -9,6 +9,7 @@ import { HudContainer } from '../../components/ui/HudContainer';
 import { Button } from '../../components/ui/Button';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { theme } from '../../constants/theme';
+import { scale, verticalScale, fontSize as fs, lineHeight } from '../../utils/responsive';
 import { useAuthContext } from '../../context/AuthContext';
 import { WorkoutPlannerService } from '../../services/workoutPlannerService';
 import { ComprehensiveGymDatabase } from '../../services/comprehensiveGymDatabase';
@@ -56,6 +57,8 @@ export function AdvancedWorkoutPlanner({ navigation }: any) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedEquipment, setSelectedEquipment] = useState('');
+  // Separate filter state for templates tab to avoid conflicts with exercise library filter
+  const [templateCategoryFilter, setTemplateCategoryFilter] = useState('');
   
   // UI state
   const [expandedWorkout, setExpandedWorkout] = useState<string | null>(null);
@@ -149,6 +152,12 @@ export function AdvancedWorkoutPlanner({ navigation }: any) {
     
     setFilteredExercises(filtered);
   }, [allExercises, searchQuery, selectedCategory, selectedEquipment]);
+
+  // Filter templates by category
+  const filteredTemplates = React.useMemo(() => {
+    if (!templateCategoryFilter) return templates;
+    return templates.filter(t => t.category === templateCategoryFilter);
+  }, [templates, templateCategoryFilter]);
 
   // Create workout
   const handleCreateWorkout = () => {
@@ -505,13 +514,13 @@ export function AdvancedWorkoutPlanner({ navigation }: any) {
                       key={category}
                       style={[
                         styles.filterChip,
-                        selectedCategory === category && styles.filterChipActive,
+                        templateCategoryFilter === category && styles.filterChipActive,
                       ]}
-                      onPress={() => setSelectedCategory(category === 'all' ? '' : category)}
+                      onPress={() => setTemplateCategoryFilter(category === 'all' ? '' : category)}
                     >
                       <Text style={[
                         styles.filterChipText,
-                        selectedCategory === category && styles.filterChipTextActive,
+                        templateCategoryFilter === category && styles.filterChipTextActive,
                       ]}>
                         {category.toUpperCase()}
                       </Text>
@@ -520,44 +529,51 @@ export function AdvancedWorkoutPlanner({ navigation }: any) {
                 </ScrollView>
               </View>
 
-              {templates.map(template => (
-                <Card key={template.id} style={styles.templateCard}>
-                  <View style={styles.templateHeader}>
-                    <View style={styles.templateInfo}>
-                      <Text style={styles.templateName}>{template.name}</Text>
-                      <Text style={styles.templateDescription}>{template.description}</Text>
-                      <View style={styles.templateMeta}>
-                        <View style={styles.metaItem}>
-                          <Clock color={theme.colors.textDimmed} size={12} />
-                          <Text style={styles.metaText}>{template.duration}m</Text>
-                        </View>
-                        <View style={styles.metaItem}>
-                          <Star color={theme.colors.warning} size={12} />
-                          <Text style={styles.metaText}>{template.rating}</Text>
-                        </View>
-                        <View style={styles.metaItem}>
-                          <Users color={theme.colors.textDimmed} size={12} />
-                          <Text style={styles.metaText}>{template.uses}</Text>
-                        </View>
-                      </View>
-                    </View>
-                    <TouchableOpacity
-                      style={styles.createButton}
-                      onPress={() => handleCreateFromTemplate(template)}
-                    >
-                      <Plus color={theme.colors.primary} size={16} />
-                    </TouchableOpacity>
-                  </View>
-                  
-                  <View style={styles.templateTags}>
-                    {template.tags.map(tag => (
-                      <View key={tag} style={styles.tag}>
-                        <Text style={styles.tagText}>{tag}</Text>
-                      </View>
-                    ))}
-                  </View>
+              {filteredTemplates.length === 0 ? (
+                <Card style={styles.emptyCard}>
+                  <Text style={styles.emptyTitle}>NO TEMPLATES FOUND</Text>
+                  <Text style={styles.emptySubtext}>Try selecting a different category</Text>
                 </Card>
-              ))}
+              ) : (
+                filteredTemplates.map(template => (
+                  <Card key={template.id} style={styles.templateCard}>
+                    <View style={styles.templateHeader}>
+                      <View style={styles.templateInfo}>
+                        <Text style={styles.templateName}>{template.name}</Text>
+                        <Text style={styles.templateDescription}>{template.description}</Text>
+                        <View style={styles.templateMeta}>
+                          <View style={styles.metaItem}>
+                            <Clock color={theme.colors.textDimmed} size={12} />
+                            <Text style={styles.metaText}>{template.duration}m</Text>
+                          </View>
+                          <View style={styles.metaItem}>
+                            <Star color={theme.colors.warning} size={12} />
+                            <Text style={styles.metaText}>{template.rating}</Text>
+                          </View>
+                          <View style={styles.metaItem}>
+                            <Users color={theme.colors.textDimmed} size={12} />
+                            <Text style={styles.metaText}>{template.uses}</Text>
+                          </View>
+                        </View>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.templateCreateButton}
+                        onPress={() => handleCreateFromTemplate(template)}
+                      >
+                        <Plus color={theme.colors.primary} size={20} />
+                      </TouchableOpacity>
+                    </View>
+                    
+                    <View style={styles.templateTags}>
+                      {template.tags.map(tag => (
+                        <View key={tag} style={styles.tag}>
+                          <Text style={styles.tagText}>{tag}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </Card>
+                ))
+              )}
             </View>
           )}
 
@@ -578,7 +594,7 @@ export function AdvancedWorkoutPlanner({ navigation }: any) {
                 
                 <Text style={styles.inputLabel}>DESCRIPTION</Text>
                 <TextInput
-                  style={[styles.input, { height: 60 }]}
+                  style={[styles.input, { height: verticalScale(60) }]}
                   value={customWorkout.description}
                   onChangeText={(text) => setCustomWorkout(prev => ({ ...prev, description: text }))}
                   placeholder="Describe your workout"
@@ -738,7 +754,7 @@ export function AdvancedWorkoutPlanner({ navigation }: any) {
               </ScrollView>
             </View>
             
-            <ScrollView style={{ maxHeight: 400 }}>
+            <ScrollView style={{ maxHeight: verticalScale(400) }}>
               {filteredExercises.slice(0, 50).map((exercise: Exercise) => {
                 const isSelected = customWorkout.exercises?.find(ex => ex.id === exercise.id);
                 return (
@@ -848,13 +864,13 @@ const styles = StyleSheet.create({
     paddingBottom: theme.spacing.md,
   },
   title: {
-    fontSize: 24,
+    fontSize: fs(24),
     fontWeight: '900',
     color: theme.colors.text.primary,
     letterSpacing: 2,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: fs(12),
     color: theme.colors.textDimmed,
     marginTop: theme.spacing.xs,
   },
@@ -880,7 +896,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(109, 221, 255, 0.1)',
   },
   tabText: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '700',
     color: theme.colors.textDimmed,
     letterSpacing: 1,
@@ -903,7 +919,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     color: theme.colors.textDimmed,
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '600',
     letterSpacing: 2,
   },
@@ -915,13 +931,13 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.lg,
   },
   emptyTitle: {
-    fontSize: 16,
+    fontSize: fs(16),
     fontWeight: '700',
     color: theme.colors.textDimmed,
     letterSpacing: 2,
   },
   emptySubtext: {
-    fontSize: 11,
+    fontSize: fs(11),
     color: theme.colors.textDimmed,
     marginTop: theme.spacing.xs,
     marginBottom: theme.spacing.lg,
@@ -943,13 +959,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   workoutName: {
-    fontSize: 16,
+    fontSize: fs(16),
     fontWeight: '700',
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.xs,
   },
   workoutDescription: {
-    fontSize: 12,
+    fontSize: fs(12),
     color: theme.colors.textDimmed,
     marginBottom: theme.spacing.sm,
   },
@@ -963,7 +979,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   metaText: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '600',
     color: theme.colors.textDimmed,
   },
@@ -972,9 +988,9 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   actionButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: scale(32),
+    height: scale(32),
+    borderRadius: scale(16),
     backgroundColor: 'rgba(255,255,255,0.05)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -988,7 +1004,7 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(255,255,255,0.05)',
   },
   exercisesTitle: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '700',
     color: theme.colors.textDimmed,
     letterSpacing: 1.5,
@@ -1000,13 +1016,13 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.xs,
   },
   exerciseNumber: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: scale(20),
+    height: scale(20),
+    borderRadius: scale(10),
     backgroundColor: theme.colors.primary + '20',
     textAlign: 'center',
-    lineHeight: 20,
-    fontSize: 10,
+    lineHeight: lineHeight(fs(10)),
+    fontSize: fs(10),
     fontWeight: '700',
     color: theme.colors.primary,
     marginRight: theme.spacing.md,
@@ -1015,17 +1031,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   exerciseName: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '600',
     color: theme.colors.text.primary,
   },
   exerciseDetails: {
-    fontSize: 10,
+    fontSize: fs(10),
     color: theme.colors.textDimmed,
     marginTop: 2,
   },
   exerciseCalories: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '600',
     color: theme.colors.primary,
   },
@@ -1034,7 +1050,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.sm,
   },
   
-  // Template cards
+  // Template cards  
   templateCard: {
     marginBottom: theme.spacing.md,
   },
@@ -1047,13 +1063,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   templateName: {
-    fontSize: 16,
+    fontSize: fs(16),
     fontWeight: '700',
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.xs,
   },
   templateDescription: {
-    fontSize: 12,
+    fontSize: fs(12),
     color: theme.colors.textDimmed,
     marginBottom: theme.spacing.sm,
   },
@@ -1061,10 +1077,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: theme.spacing.md,
   },
-  createButton: {
-    width: '100%',
-    height: 56,
-    marginTop: theme.spacing.lg,
+  templateCreateButton: {
+    width: scale(44),
+    height: scale(44),
+    borderRadius: scale(22),
+    backgroundColor: 'rgba(109, 221, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+    marginLeft: theme.spacing.md,
   },
   templateTags: {
     flexDirection: 'row',
@@ -1079,7 +1101,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.border.radius.sm,
   },
   tagText: {
-    fontSize: 9,
+    fontSize: fs(9),
     fontWeight: '700',
     color: theme.colors.primary,
     letterSpacing: 1,
@@ -1090,14 +1112,14 @@ const styles = StyleSheet.create({
     padding: theme.spacing.lg,
   },
   createTitle: {
-    fontSize: 18,
+    fontSize: fs(18),
     fontWeight: '900',
     color: theme.colors.text.primary,
     letterSpacing: 2,
     marginBottom: theme.spacing.lg,
   },
   inputLabel: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '700',
     color: theme.colors.textDimmed,
     letterSpacing: 1.5,
@@ -1108,7 +1130,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
     color: theme.colors.text.primary,
-    fontSize: 14,
+    fontSize: fs(14),
     paddingVertical: theme.spacing.sm,
   },
   row: {
@@ -1136,7 +1158,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(109, 221, 255, 0.1)',
   },
   optionText: {
-    fontSize: 8,
+    fontSize: fs(8),
     fontWeight: '700',
     color: theme.colors.textDimmed,
     letterSpacing: 1,
@@ -1156,7 +1178,7 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.md,
   },
   addExercisesText: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '700',
     color: theme.colors.primary,
     letterSpacing: 1,
@@ -1170,7 +1192,7 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(255,255,255,0.05)',
   },
   exercisesPreviewTitle: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '700',
     color: theme.colors.textDimmed,
     letterSpacing: 1.5,
@@ -1182,13 +1204,13 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.sm,
   },
   exercisePreviewNumber: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: scale(20),
+    height: scale(20),
+    borderRadius: scale(10),
     backgroundColor: theme.colors.primary + '20',
     textAlign: 'center',
-    lineHeight: 20,
-    fontSize: 10,
+    lineHeight: lineHeight(fs(10)),
+    fontSize: fs(10),
     fontWeight: '700',
     color: theme.colors.primary,
     marginRight: theme.spacing.md,
@@ -1197,12 +1219,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   exercisePreviewName: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '600',
     color: theme.colors.text.primary,
   },
   exercisePreviewDetails: {
-    fontSize: 10,
+    fontSize: fs(10),
     color: theme.colors.textDimmed,
     marginTop: 2,
   },
@@ -1211,17 +1233,17 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
   },
   editExerciseBtn: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: scale(24),
+    height: scale(24),
+    borderRadius: scale(12),
     backgroundColor: 'rgba(109, 221, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   removeExerciseBtn: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: scale(20),
+    height: scale(20),
+    borderRadius: scale(10),
     backgroundColor: 'rgba(255, 0, 0, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -1244,7 +1266,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(109, 221, 255, 0.1)',
   },
   filterChipText: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '700',
     color: theme.colors.textDimmed,
     letterSpacing: 1,
@@ -1274,7 +1296,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   modalTitle: {
-    fontSize: 16,
+    fontSize: fs(16),
     fontWeight: '900',
     color: theme.colors.text.primary,
     letterSpacing: 2,
@@ -1298,7 +1320,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     color: theme.colors.text.primary,
-    fontSize: 14,
+    fontSize: fs(14),
   },
   
   // Exercise options
@@ -1318,9 +1340,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   exerciseTypeIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: scale(36),
+    height: scale(36),
+    borderRadius: scale(18),
     backgroundColor: 'rgba(109, 221, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -1330,25 +1352,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   exerciseOptionName: {
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '600',
     color: theme.colors.text.primary,
   },
   exerciseOptionDetails: {
-    fontSize: 11,
+    fontSize: fs(11),
     color: theme.colors.textDimmed,
     marginTop: 2,
   },
   exerciseOptionCalories: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '600',
     color: theme.colors.primary,
     marginTop: 2,
   },
   exerciseCheckbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: scale(24),
+    height: scale(24),
+    borderRadius: scale(12),
     borderWidth: 2,
     borderColor: theme.colors.border,
     justifyContent: 'center',
@@ -1360,7 +1382,7 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     color: theme.colors.background,
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '700',
   },
   sessionCard: {
@@ -1368,13 +1390,17 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
   },
   sessionName: {
-    fontSize: 13,
+    fontSize: fs(13),
     fontWeight: '700',
     color: theme.colors.text.primary,
   },
   sessionMeta: {
-    fontSize: 11,
+    fontSize: fs(11),
     color: theme.colors.textDimmed,
     marginTop: 4,
+  },
+  createButton: {
+    width: '100%',
+    marginTop: theme.spacing.lg,
   },
 });

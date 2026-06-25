@@ -10,6 +10,7 @@ import { Button } from '../../components/ui/Button';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { GlowInput } from '../../components/ui/GlowInput';
 import { theme } from '../../constants/theme';
+import { scale, verticalScale, fontSize as fs, lineHeight } from '../../utils/responsive';
 import { useAuthContext } from '../../context/AuthContext';
 import { DailyProgressService } from '../../services/statsService';
 import { ExerciseDatabaseService } from '../../services/exerciseDatabase';
@@ -325,7 +326,7 @@ export function WorkoutPlanner({ navigation }: any) {
           <ChevronRight color={theme.colors.text} size={18} />
         </TouchableOpacity>
 
-          <View style={{ height: 32 }} />
+          <View style={{ height: verticalScale(32) }} />
         </ScrollView>
       </Animated.View>
       
@@ -398,7 +399,7 @@ export function WorkoutPlanner({ navigation }: any) {
               </TouchableOpacity>
             </View>
             
-            <ScrollView style={{ maxHeight: 400 }}>
+            <ScrollView style={{ maxHeight: verticalScale(400) }}>
               <View style={styles.searchContainer}>
                 <GlowInput
                   value={searchQuery}
@@ -483,7 +484,7 @@ const styles = StyleSheet.create({
   },
   selectedInfo: { flex: 1 },
   selectedName: {
-    fontSize: 18,
+    fontSize: fs(18),
     fontWeight: '900',
     color: theme.colors.text.primary,
     letterSpacing: 1,
@@ -500,7 +501,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   metaText: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '700',
     color: theme.colors.text.secondary,
     letterSpacing: 1,
@@ -511,7 +512,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.border.radius.sm,
   },
   difficultyText: {
-    fontSize: 9,
+    fontSize: fs(9),
     fontWeight: '800',
     letterSpacing: 1,
   },
@@ -519,7 +520,7 @@ const styles = StyleSheet.create({
   // Exercises list
   exercisesList: { marginBottom: theme.spacing.lg },
   exercisesTitle: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '700',
     color: theme.colors.text.secondary,
     letterSpacing: 1.5,
@@ -533,30 +534,30 @@ const styles = StyleSheet.create({
     borderBottomColor: theme.colors.bg.glassBorder,
   },
   exerciseNumber: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: scale(24),
+    height: scale(24),
+    borderRadius: scale(12),
     backgroundColor: theme.colors.primary + '20',
     textAlign: 'center',
-    lineHeight: 24,
-    fontSize: 12,
+    lineHeight: lineHeight(fs(12)),
+    fontSize: fs(12),
     fontWeight: '700',
     color: theme.colors.primary,
     marginRight: theme.spacing.md,
   },
   exerciseInfo: { flex: 1 },
   exerciseName: {
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '600',
     color: theme.colors.text.primary,
   },
   exerciseDetails: {
-    fontSize: 11,
+    fontSize: fs(11),
     color: theme.colors.text.secondary,
     marginTop: 2,
   },
   exerciseCalories: {
-    fontSize: 11,
+    fontSize: fs(11),
     fontWeight: '600',
     color: theme.colors.primary,
   },
@@ -573,13 +574,13 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   emptyTitle: {
-    fontSize: 16,
+    fontSize: fs(16),
     fontWeight: '700',
     color: theme.colors.text.secondary,
     letterSpacing: 2,
   },
   emptySubtext: {
-    fontSize: 11,
+    fontSize: fs(11),
     color: theme.colors.text.secondary,
     marginTop: theme.spacing.xs,
   },
@@ -604,9 +605,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   workoutIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: scale(40),
+    height: scale(40),
+    borderRadius: scale(20),
     backgroundColor: theme.colors.primary + '15',
     justifyContent: 'center',
     alignItems: 'center',
@@ -614,7 +615,7 @@ const styles = StyleSheet.create({
   },
   workoutInfo: { flex: 1 },
   workoutName: {
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '600',
     color: theme.colors.text.primary,
     marginBottom: 2,
@@ -624,15 +625,15 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
   },
   workoutDuration: {
-    fontSize: 10,
+    fontSize: fs(10),
     color: '#FFFFFF',
   },
   workoutCalories: {
-    fontSize: 10,
+    fontSize: fs(10),
     color: '#FFFFFF',
   },
   workoutDifficulty: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '700',
     color: '#FFFFFF',
   },
@@ -652,31 +653,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   createIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: scale(40),
+    height: scale(40),
+    borderRadius: scale(20),
     backgroundColor: theme.colors.primary + '15',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: theme.spacing.md,
   },
   createTitle: {
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '600',
     color: theme.colors.text.primary,
   },
   createSubtext: {
-    fontSize: 11,
+    fontSize: fs(11),
     color: '#FFFFFF',
     marginTop: 2,
   },
   
   // Modal
   dragHandle: {
-    width: 40,
-    height: 4,
+    width: scale(40),
+    height: verticalScale(4),
     backgroundColor: theme.colors.bg.glassBorder,
-    borderRadius: 2,
+    borderRadius: scale(2),
     alignSelf: 'center',
     marginBottom: theme.spacing.lg,
   },
@@ -702,13 +703,13 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   modalTitle: {
-    fontSize: 16,
+    fontSize: fs(16),
     fontWeight: '900',
     color: '#FFFFFF',
     letterSpacing: 2,
   },
   inputLabel: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '700',
     color: '#FFFFFF',
     letterSpacing: 1.5,
@@ -732,7 +733,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary + '15',
   },
   optionText: {
-    fontSize: 11,
+    fontSize: fs(11),
     fontWeight: '700',
     color: '#FFFFFF',
     letterSpacing: 1,
@@ -754,7 +755,7 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.md,
   },
   addExercisesText: {
-    fontSize: 13,
+    fontSize: fs(13),
     fontWeight: '700',
     color: theme.colors.primary,
     letterSpacing: 1,
@@ -777,34 +778,34 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   exerciseTypeIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: scale(36),
+    height: scale(36),
+    borderRadius: scale(18),
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: theme.spacing.md,
   },
   exerciseOptionInfo: { flex: 1 },
   exerciseOptionName: {
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '600',
     color: '#FFFFFF',
   },
   exerciseOptionDetails: {
-    fontSize: 11,
+    fontSize: fs(11),
     color: '#FFFFFF',
     marginTop: 2,
   },
   exerciseOptionCalories: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '600',
     color: theme.colors.primary,
     marginTop: 2,
   },
   exerciseCheckbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: scale(24),
+    height: scale(24),
+    borderRadius: scale(12),
     borderWidth: 2,
     borderColor: theme.colors.bg.glassBorder,
     justifyContent: 'center',
@@ -816,7 +817,7 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     color: theme.colors.bg.base,
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '700',
   },
   
@@ -840,7 +841,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary + '15',
   },
   filterChipText: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '700',
     color: '#FFFFFF',
     letterSpacing: 1,

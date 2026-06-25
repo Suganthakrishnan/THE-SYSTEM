@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ascend",
-    "slug": "SystemFit",
+    "name": "Ascend",
+    "slug": "ascend",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,20 +13,20 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.systemfit.app"
+      "bundleIdentifier": "com.Ascend.app"
     },
     "android": {
       "predictiveBackGestureEnabled": false,
-      "package": "com.systemfit.app"
+      "package": "com.Ascend.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "79e424f1-e4e9-4e4c-a2cd-35981d0d53d9"
+        "projectId": "0fd55895-6942-49e1-82df-46ee1beee64f"
       }
     },
-    "owner": "sugantha_krishnan"
+    "owner": "sugannjrs-team"
   }
 }

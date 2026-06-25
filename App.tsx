@@ -4,6 +4,7 @@ import { AuthProvider } from './src/context/AuthContext';
 import { PersistenceProvider } from './src/context/PersistenceContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { WorkoutPlannerService } from './src/services/workoutPlannerService';
+import { configureGoogleSignIn } from './src/hooks/useGoogleSignIn';
 
 function ErrorFallback({ error }: { error: Error }) {
   return (
@@ -17,6 +18,12 @@ function ErrorFallback({ error }: { error: Error }) {
 export default function App() {
   // Initialize WorkoutPlannerService globally
   WorkoutPlannerService.initialize().catch(console.error);
+
+  // Configure Google Sign-In with the Web Client ID from env
+  const googleWebClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+  if (googleWebClientId) {
+    configureGoogleSignIn(googleWebClientId);
+  }
 
   return (
     <AuthProvider>

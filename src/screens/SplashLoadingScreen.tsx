@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Animated, StyleSheet } from 'react-native';
 import { theme } from '../constants/theme';
+import { scale, verticalScale, fontSize as fs } from '../utils/responsive';
 
 export function SplashLoadingScreen() {
   const pulseAnim = useRef(new Animated.Value(0.5)).current;
@@ -41,7 +42,7 @@ export function SplashLoadingScreen() {
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.scanningLine, { transform: [{ translateY: scanAnim.interpolate({ inputRange: [0, 1], outputRange: [-100, 100] }) }] }]} />
+      <Animated.View style={[styles.scanningLine, { transform: [{ translateY: scanAnim.interpolate({ inputRange: [0, 1], outputRange: [-verticalScale(100), verticalScale(100)] }) }] }]} />
       <View style={styles.topLine} />
       <View style={styles.bottomLine} />
       <View style={[styles.corner, styles.cornerTL]} />
@@ -74,23 +75,23 @@ const styles = StyleSheet.create({
     opacity: 0.6,
     shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 10,
+    shadowRadius: scale(10),
     shadowOpacity: 0.8,
   },
   topLine: { position: 'absolute', top: 0, left: 0, right: 0, height: 2, backgroundColor: theme.colors.primary, opacity: 0.4 },
   bottomLine: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, backgroundColor: theme.colors.primary, opacity: 0.4 },
-  corner: { position: 'absolute', width: 24, height: 24, borderColor: theme.colors.primary, opacity: 0.5 },
-  cornerTL: { top: 24, left: 24, borderTopWidth: 2, borderLeftWidth: 2 },
-  cornerTR: { top: 24, right: 24, borderTopWidth: 2, borderRightWidth: 2 },
-  cornerBL: { bottom: 24, left: 24, borderBottomWidth: 2, borderLeftWidth: 2 },
-  cornerBR: { bottom: 24, right: 24, borderBottomWidth: 2, borderRightWidth: 2 },
+  corner: { position: 'absolute', width: scale(24), height: scale(24), borderColor: theme.colors.primary, opacity: 0.5 },
+  cornerTL: { top: scale(24), left: scale(24), borderTopWidth: 2, borderLeftWidth: 2 },
+  cornerTR: { top: scale(24), right: scale(24), borderTopWidth: 2, borderRightWidth: 2 },
+  cornerBL: { bottom: scale(24), left: scale(24), borderBottomWidth: 2, borderLeftWidth: 2 },
+  cornerBR: { bottom: scale(24), right: scale(24), borderBottomWidth: 2, borderRightWidth: 2 },
   center: { alignItems: 'center' },
   logo: {
-    fontSize: 40, fontWeight: '900', color: theme.colors.primary, letterSpacing: 6, fontFamily: theme.fonts.heading,
-    textShadowColor: theme.colors.primary, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 20,
+    fontSize: fs(40), fontWeight: '900', color: theme.colors.primary, letterSpacing: 6, fontFamily: theme.fonts.heading,
+    textShadowColor: theme.colors.primary, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: scale(20),
   },
-  divider: { width: 60, height: 1.5, backgroundColor: theme.colors.primary, marginVertical: theme.spacing.md, opacity: 0.5 },
-  subtitle: { fontSize: 11, color: theme.colors.text.secondary, letterSpacing: 3, marginBottom: theme.spacing.lg },
-  dots: { flexDirection: 'row', gap: 8 },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: theme.colors.primary },
+  divider: { width: scale(60), height: 1.5, backgroundColor: theme.colors.primary, marginVertical: theme.spacing.md, opacity: 0.5 },
+  subtitle: { fontSize: fs(11), color: theme.colors.text.secondary, letterSpacing: 3, marginBottom: theme.spacing.lg },
+  dots: { flexDirection: 'row', gap: scale(8) },
+  dot: { width: scale(6), height: scale(6), borderRadius: scale(3), backgroundColor: theme.colors.primary },
 });

@@ -10,6 +10,7 @@ import {
   TextInput,
 } from 'react-native';
 import { useAuthContext } from '../context/AuthContext';
+import { scale, verticalScale, fontSize as fs } from '../utils/responsive';
 import { ScheduleService, ScheduledWorkout, CalendarEvent } from '../services/scheduleService';
 import { Card } from '../components/ui/Card';
 import { SectionHeader } from '../components/ui/SectionHeader';
@@ -549,6 +550,7 @@ const styles = StyleSheet.create({
   modalButton: {
     flex: 1,
     marginHorizontal: theme.spacing.xs,
+    minWidth: 100,
   },
   spacer: {
     height: theme.spacing.xl,

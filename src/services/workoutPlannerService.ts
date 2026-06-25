@@ -311,7 +311,7 @@ export class WorkoutPlannerService {
             instructions: 'Standard push-up form',
             restTime: 45,
           },
-        ],
+        ].map((ex, i) => ({ ...ex, id: ex.id ?? `ex_sample_${Date.now()}_${i}` })),
         difficulty: 'beginner',
         targetMuscles: ['full_body'],
         estimatedCalories: 180,
@@ -367,6 +367,7 @@ export class WorkoutPlannerService {
       duration: template.duration,
       exercises: template.exercises.map((exercise, index) => ({
         ...exercise,
+        id: (exercise as any).id ?? `ex_${Date.now()}_${index}`,
         order: index + 1,
       })),
       difficulty: template.difficulty,
@@ -391,6 +392,7 @@ export class WorkoutPlannerService {
     const newWorkout: CustomWorkoutPlan = {
       ...workout,
       id: `custom_${Date.now()}`,
+      exercises: workout.exercises?.map((ex, i) => ({ ...ex, id: (ex as any).id ?? `ex_${Date.now()}_${i}` })) || [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -442,6 +444,7 @@ export class WorkoutPlannerService {
 
     const newExercise: CustomExercise = {
       ...exercise,
+      id: (exercise as any).id ?? `ex_${Date.now()}_${workout.exercises.length + 1}`,
       order: workout.exercises.length + 1,
     };
 

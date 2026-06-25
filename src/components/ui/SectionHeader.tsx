@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import { theme } from '../../constants/theme';
+import { scale, verticalScale } from '../../utils/responsive';
 
 interface SectionHeaderProps {
   title: string;
@@ -22,7 +23,7 @@ export function SectionHeader({ title, icon, actionLabel, onAction, style }: Sec
       {actionLabel && onAction && (
         <TouchableOpacity onPress={onAction} style={styles.action} activeOpacity={0.6}>
           <Text style={styles.actionText}>{actionLabel}</Text>
-          <ChevronRight color={theme.colors.primary} size={14} />
+          <ChevronRight color={theme.colors.primary} size={theme.iconSizes.md} />
         </TouchableOpacity>
       )}
     </View>
@@ -42,24 +43,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   accentLine: {
-    width: 3,
-    height: 16,
+    width: scale(3),
+    height: scale(16),
     backgroundColor: theme.colors.primary,
     marginRight: theme.spacing.sm,
     shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
-    shadowRadius: 4,
+    shadowRadius: scale(4),
     elevation: 3,
   },
   iconWrap: {
     marginRight: theme.spacing.sm,
   },
   title: {
-    fontSize: 13,
+    fontSize: theme.fontSizes.md,
     fontWeight: '800',
-    color: theme.colors.text,
-    letterSpacing: 2,
+    color: theme.colors.text.primary,
+    letterSpacing: scale(2),
     textTransform: 'uppercase',
   },
   action: {
@@ -67,10 +68,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   actionText: {
-    fontSize: 11,
+    fontSize: theme.fontSizes.sm,
     fontWeight: '600',
     color: theme.colors.primary,
-    letterSpacing: 1,
-    marginRight: 2,
+    letterSpacing: scale(1),
+    marginRight: scale(2),
   },
 });

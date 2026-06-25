@@ -13,6 +13,7 @@ import { AnimatedCounter } from '../../components/ui/AnimatedCounter';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { GlowInput } from '../../components/ui/GlowInput';
 import { theme } from '../../constants/theme';
+import { scale, verticalScale, fontSize as fs } from '../../utils/responsive';
 import { useAuthContext } from '../../context/AuthContext';
 import { StatsService, PreferencesService, DailyProgressService } from '../../services/statsService';
 import { QuestService } from '../../services/questService';
@@ -503,10 +504,10 @@ export const Profile = React.memo(function Profile() {
             <View style={styles.levelSection}>
               <View style={styles.levelRow}>
                 <Text style={styles.levelLabel}>LEVEL {userStats.level}</Text>
-                <Text style={styles.xpText}>
-                  {userStats.current_xp} / {userStats.xp_to_next_level} XP
-                </Text>
               </View>
+              <Text style={styles.xpText}>
+                {userStats.current_xp} / {userStats.xp_to_next_level} XP
+              </Text>
               <View style={styles.xpBarTrack}>
                 <View style={[styles.xpBarFill, { width: `${Math.min(xpProgress * 100, 100)}%` }]} />
               </View>
@@ -707,7 +708,7 @@ export const Profile = React.memo(function Profile() {
           style={styles.logoutBtn}
         />
 
-        <View style={{ height: 32 }} />
+        <View style={{ height: verticalScale(32) }} />
       </ScrollView>
       </Animated.View>
       
@@ -1159,15 +1160,15 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   avatar: {
-    width: 88,
-    height: 88,
+    width: scale(88),
+    height: scale(88),
     backgroundColor: theme.colors.bg.glass,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 44,
+    borderRadius: scale(44),
   },
   avatarInitials: {
-    fontSize: 32,
+    fontSize: fs(32),
     fontWeight: '900',
     color: theme.colors.primary,
     letterSpacing: 2,
@@ -1185,20 +1186,22 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xs,
   },
   levelLabel: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '800',
     color: theme.colors.primary,
     letterSpacing: 2,
   },
   xpText: {
-    fontSize: 11,
+    fontSize: fs(11),
     color: theme.colors.text.secondary,
     letterSpacing: 1,
+    marginTop: 2,
+    marginBottom: theme.spacing.sm,
   },
   xpBarTrack: {
-    height: 6,
+    height: verticalScale(6),
     backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 3,
+    borderRadius: scale(3),
     overflow: 'hidden',
   },
   xpBarFill: {
@@ -1207,7 +1210,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   playerName: {
-    fontSize: 24,
+    fontSize: fs(24),
     fontWeight: '900',
     color: theme.colors.text.primary,
     letterSpacing: 3,
@@ -1293,11 +1296,11 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   badgeIconWrap: {
-    width: 48,
-    height: 48,
+    width: scale(48),
+    height: scale(48),
     borderWidth: 1,
     borderColor: theme.colors.bg.glassBorder,
-    borderRadius: 12,
+    borderRadius: scale(12),
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 6,
@@ -1355,9 +1358,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 4,
     right: 4,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: scale(24),
+    height: scale(24),
+    borderRadius: scale(12),
     backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1391,10 +1394,10 @@ const styles = StyleSheet.create({
   
   // Modal
   dragHandle: {
-    width: 40,
-    height: 4,
+    width: scale(40),
+    height: verticalScale(4),
     backgroundColor: theme.colors.bg.glassBorder,
-    borderRadius: 2,
+    borderRadius: scale(2),
     alignSelf: 'center',
     marginBottom: theme.spacing.lg,
   },
@@ -1419,7 +1422,7 @@ const styles = StyleSheet.create({
     borderTopColor: theme.colors.bg.glassBorder,
     padding: theme.spacing.md,
     paddingBottom: theme.spacing.xl,
-    maxHeight: '70%',
+    maxHeight: '80%',
     zIndex: 1001,
   },
   modalHeader: {
@@ -1554,8 +1557,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.bg.glassBorder,
   },
@@ -1563,21 +1566,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   attributeAllocationLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
     color: theme.colors.text.secondary,
     letterSpacing: 1.5,
-    marginBottom: 2,
+    marginBottom: 1,
   },
   attributeAllocationValue: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '800',
     fontFamily: theme.fonts.heading,
   },
   allocateButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: scale(32),
+    height: scale(32),
+    borderRadius: scale(16),
     backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
@@ -1607,8 +1610,8 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   achievementIconWrap: {
-    width: 56,
-    height: 56,
+    width: scale(56),
+    height: scale(56),
     borderWidth: 1,
     borderColor: theme.colors.primary,
     alignItems: 'center',

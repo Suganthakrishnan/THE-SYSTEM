@@ -13,6 +13,7 @@ import { NotificationService, Notification, NotificationPreferences } from '../s
 import { Card } from '../components/ui/Card';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { Button } from '../components/ui/Button';
+import { scale, verticalScale, fontSize as fs } from '../utils/responsive';
 import { theme } from '../constants/theme';
 import { Bell, Check, Trash2, Settings, Clock, Trophy, Flame, Zap, Info } from 'lucide-react-native';
 
@@ -308,7 +309,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '900',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
   },
   headerSubtitle: {
     fontSize: 12,
@@ -347,7 +348,7 @@ const styles = StyleSheet.create({
   preferencesTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
     marginLeft: theme.spacing.sm,
   },
   preferenceItem: {
@@ -361,7 +362,7 @@ const styles = StyleSheet.create({
   preferenceLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
   },
   notificationsCard: {
     marginHorizontal: theme.spacing.md,
@@ -392,7 +393,7 @@ const styles = StyleSheet.create({
   notificationTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
     marginBottom: theme.spacing.xs,
   },
   notificationTitleUnread: {
@@ -418,7 +419,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
     marginTop: theme.spacing.md,
   },
   emptySubtext: {

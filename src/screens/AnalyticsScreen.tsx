@@ -16,6 +16,7 @@ import { AnalyticsService, AnalyticsSummary, WorkoutFrequencyData, XPTrendData, 
 import { HudContainer } from '../components/ui/HudContainer';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { theme } from '../constants/theme';
+import { scale, verticalScale, fontSize as fs } from '../utils/responsive';
 import { TrendingUp, TrendingDown, Award, Flame, Target, Zap } from 'lucide-react-native';
 
 const screenWidth = Dimensions.get('window').width;
@@ -94,7 +95,7 @@ export function AnalyticsScreen() {
       stroke: theme.colors.primary,
     },
     propsForLabels: {
-      fontSize: 10,
+      fontSize: fs(10),
     },
   };
 
@@ -102,7 +103,7 @@ export function AnalyticsScreen() {
     ...chartConfig,
     color: (opacity = 1) => `rgba(172, 137, 255, ${opacity})`,
     propsForLabels: {
-      fontSize: 10,
+      fontSize: fs(10),
     },
   };
 
@@ -362,7 +363,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary + '20',
   },
   tabText: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '700',
     color: theme.colors.text.secondary,
     letterSpacing: 1,
@@ -388,14 +389,14 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
   },
   statTitle: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '700',
     color: theme.colors.text.secondary,
     marginLeft: theme.spacing.sm,
     letterSpacing: 0.5,
   },
   statValue: {
-    fontSize: 24,
+    fontSize: fs(24),
     fontWeight: '900',
     color: theme.colors.text.primary,
     letterSpacing: 1,
@@ -407,7 +408,7 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xs,
   },
   changeText: {
-    fontSize: 11,
+    fontSize: fs(11),
     fontWeight: '700',
     marginLeft: theme.spacing.xs,
   },
@@ -427,7 +428,7 @@ const styles = StyleSheet.create({
     padding: theme.spacing.sm,
   },
   chartTitle: {
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '800',
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.md,
@@ -439,7 +440,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.border.radius.lg,
   },
   noDataText: {
-    fontSize: 14,
+    fontSize: fs(14),
     color: theme.colors.text.secondary,
     textAlign: 'center',
     paddingVertical: theme.spacing.xl,
@@ -459,20 +460,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   comparisonLabel: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '700',
     color: theme.colors.text.secondary,
     marginBottom: theme.spacing.sm,
   },
   comparisonValue: {
-    fontSize: 20,
+    fontSize: fs(20),
     fontWeight: '900',
     color: theme.colors.primary,
     marginBottom: theme.spacing.xs,
     fontFamily: theme.fonts.heading,
   },
   comparisonSubValue: {
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '600',
     color: theme.colors.text.secondary,
   },

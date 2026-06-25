@@ -52,17 +52,17 @@ export function AppNavigator() {
             <RootStack.Screen name="MainTabs" component={TabNavigator} />
             <RootStack.Screen name="WorkoutPlanner"
               options={{ headerShown: true, headerStyle: { backgroundColor: '#080B12' }, headerTintColor: theme.colors.text.primary, title: 'WORKOUT PLANNER' }}>
-              {() => (
+              {(props) => (
                 <Suspense fallback={<LoadingFallback />}>
-                  <AdvancedWorkoutPlanner />
+                  <AdvancedWorkoutPlanner {...props} />
                 </Suspense>
               )}
             </RootStack.Screen>
             <RootStack.Screen name="WorkoutSession"
               options={{ headerShown: false }}>
-              {() => (
+              {(props) => (
                 <Suspense fallback={<LoadingFallback />}>
-                  <WorkoutSession />
+                  <WorkoutSession {...props} />
                 </Suspense>
               )}
             </RootStack.Screen>

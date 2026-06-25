@@ -6,6 +6,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronLeft, Check } from 'lucide-react-native';
 import { theme } from '../../constants/theme';
+import { scale, verticalScale, fontSize as fs } from '../../utils/responsive';
 import { GlowInput } from '../../components/ui/GlowInput';
 import { Button } from '../../components/ui/Button';
 import { useAuthContext } from '../../context/AuthContext';
@@ -69,7 +70,7 @@ export function RegisterScreen({ navigation }: any) {
             accessibilityHint="Return to the previous screen"
             accessibilityRole="button"
           >
-            <ChevronLeft color={theme.colors.primary} size={20} />
+            <ChevronLeft color={theme.colors.primary} size={theme.iconSizes.xxl} />
             <Text style={styles.backText}>BACK</Text>
           </TouchableOpacity>
 
@@ -133,7 +134,7 @@ export function RegisterScreen({ navigation }: any) {
             accessibilityState={{ checked: agreedToTerms }}
           >
             <View style={[styles.checkbox, agreedToTerms && styles.checkboxChecked]}>
-              {agreedToTerms && <Check color={theme.colors.bg.base} size={14} />}
+              {agreedToTerms && <Check color={theme.colors.bg.base} size={theme.iconSizes.md} />}
             </View>
             <View style={styles.checkboxTextContainer}>
               <Text style={styles.checkboxLabel}>I agree to the </Text>
@@ -188,51 +189,51 @@ export function RegisterScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.bg.base },
-  gradientTop: { position: 'absolute', top: 0, left: 0, right: 0, height: 240 },
-  corner: { position: 'absolute', width: 22, height: 22, borderColor: theme.colors.primary, opacity: 0.5 },
-  cTL: { top: 22, left: 22, borderTopWidth: 2, borderLeftWidth: 2 },
-  cTR: { top: 22, right: 22, borderTopWidth: 2, borderRightWidth: 2 },
-  cBL: { bottom: 22, left: 22, borderBottomWidth: 2, borderLeftWidth: 2 },
-  cBR: { bottom: 22, right: 22, borderBottomWidth: 2, borderRightWidth: 2 },
+  gradientTop: { position: 'absolute', top: 0, left: 0, right: 0, height: verticalScale(240) },
+  corner: { position: 'absolute', width: scale(22), height: scale(22), borderColor: theme.colors.primary, opacity: 0.5 },
+  cTL: { top: scale(22), left: scale(22), borderTopWidth: 2, borderLeftWidth: 2 },
+  cTR: { top: scale(22), right: scale(22), borderTopWidth: 2, borderRightWidth: 2 },
+  cBL: { bottom: scale(22), left: scale(22), borderBottomWidth: 2, borderLeftWidth: 2 },
+  cBR: { bottom: scale(22), right: scale(22), borderBottomWidth: 2, borderRightWidth: 2 },
   scroll: { flexGrow: 1, padding: theme.spacing.lg, paddingTop: theme.spacing.xl },
-  backBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: theme.spacing.xl },
-  backText: { color: theme.colors.primary, fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  backBtn: { flexDirection: 'row', alignItems: 'center', gap: scale(4), marginBottom: theme.spacing.xl },
+  backText: { color: theme.colors.primary, fontSize: fs(13), fontWeight: '700', letterSpacing: 1 },
   header: { marginBottom: theme.spacing.xxl },
-  title: { fontSize: 34, fontWeight: '900', color: theme.colors.text.primary, letterSpacing: 3, fontFamily: theme.fonts.heading },
+  title: { fontSize: fs(34), fontWeight: '900', color: theme.colors.text.primary, letterSpacing: 3, fontFamily: theme.fonts.heading },
   titleAccent: {
-    fontSize: 34, fontWeight: '900', color: theme.colors.primary, letterSpacing: 3,
-    textShadowColor: theme.colors.primary, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 12,
+    fontSize: fs(34), fontWeight: '900', color: theme.colors.primary, letterSpacing: 3,
+    textShadowColor: theme.colors.primary, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: scale(12),
     fontFamily: theme.fonts.heading,
   },
-  subtitle: { fontSize: 13, color: theme.colors.text.secondary, marginTop: theme.spacing.sm },
-  divider: { width: 40, height: 1.5, backgroundColor: theme.colors.primary, marginTop: theme.spacing.md, opacity: 0.6 },
+  subtitle: { fontSize: fs(13), color: theme.colors.text.secondary, marginTop: theme.spacing.sm },
+  divider: { width: scale(40), height: verticalScale(1.5), backgroundColor: theme.colors.primary, marginTop: theme.spacing.md, opacity: 0.6 },
   errorBox: {
     backgroundColor: theme.colors.danger + '15', borderWidth: 1, borderColor: theme.colors.danger,
     borderRadius: theme.border.radius.md, padding: theme.spacing.md, marginBottom: theme.spacing.md,
   },
-  errorText: { color: theme.colors.danger, fontSize: 13, fontWeight: '600' },
-  errorTextSmall: { color: theme.colors.danger, fontSize: 12, marginTop: theme.spacing.xs, marginBottom: theme.spacing.sm },
+  errorText: { color: theme.colors.danger, fontSize: fs(13), fontWeight: '600' },
+  errorTextSmall: { color: theme.colors.danger, fontSize: fs(12), marginTop: theme.spacing.xs, marginBottom: theme.spacing.sm },
   submitBtn: { marginTop: theme.spacing.sm, marginBottom: theme.spacing.lg },
   linkRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: theme.spacing.sm },
-  linkPrompt: { color: theme.colors.text.secondary, fontSize: 13, letterSpacing: 1 },
-  linkAction: { color: theme.colors.primary, fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  linkPrompt: { color: theme.colors.text.secondary, fontSize: fs(13), letterSpacing: 1 },
+  linkAction: { color: theme.colors.primary, fontSize: fs(13), fontWeight: '700', letterSpacing: 1 },
   checkboxRow: { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.sm, marginBottom: theme.spacing.md },
   checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
+    width: scale(20),
+    height: scale(20),
+    borderRadius: scale(4),
     borderWidth: 2,
     borderColor: theme.colors.bg.glassBorder,
     backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 2,
+    marginTop: verticalScale(2),
   },
   checkboxChecked: {
     backgroundColor: theme.colors.primary,
     borderColor: theme.colors.primary,
   },
   checkboxTextContainer: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center' },
-  checkboxLabel: { color: theme.colors.text.secondary, fontSize: 13 },
-  linkText: { color: theme.colors.primary, fontSize: 13, fontWeight: '600' },
+  checkboxLabel: { color: theme.colors.text.secondary, fontSize: fs(13) },
+  linkText: { color: theme.colors.primary, fontSize: fs(13), fontWeight: '600' },
 });

@@ -1,3 +1,5 @@
+import { scale, verticalScale, moderateScale, fontSize as fs } from '../utils/responsive';
+
 export const theme = {
   colors: {
     // Backgrounds
@@ -42,27 +44,27 @@ export const theme = {
     surfaceContainerLowest: '#FFFFFF',
   },
   spacing: {
-    xs: 4,
-    sm: 8,
-    md: 16,
-    lg: 24,
-    xl: 32,
-    xxl: 48,
+    xs: scale(4),
+    sm: scale(8),
+    md: scale(16),
+    lg: scale(24),
+    xl: scale(32),
+    xxl: scale(48),
   },
   touch: {
-    buttonMinHeight: 52,
-    tabBarHeight: 64,
-    fabSize: 60,
-    inputHeight: 52,
-    listRowMinHeight: 56,
-    chipHeight: 36,
+    buttonMinHeight: verticalScale(52),
+    tabBarHeight: verticalScale(64),
+    fabSize: scale(60),
+    inputHeight: verticalScale(52),
+    listRowMinHeight: verticalScale(56),
+    chipHeight: verticalScale(36),
   },
   border: {
     radius: {
-      sm: 8,
-      md: 12,
-      lg: 16,
-      xl: 24,
+      sm: scale(8),
+      md: scale(12),
+      lg: scale(16),
+      xl: scale(24),
     },
     width: 1,
   },
@@ -71,33 +73,57 @@ export const theme = {
       shadowColor: '#00E5FF',
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 0.6,
-      shadowRadius: 10,
+      shadowRadius: scale(10),
       elevation: 5,
     },
     violet: {
       shadowColor: '#BF5AF2',
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 0.6,
-      shadowRadius: 10,
+      shadowRadius: scale(10),
       elevation: 5,
     },
     gold: {
       shadowColor: '#FFD60A',
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 0.6,
-      shadowRadius: 10,
+      shadowRadius: scale(10),
       elevation: 5,
     },
     danger: {
       shadowColor: '#FF3B5C',
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 0.6,
-      shadowRadius: 10,
+      shadowRadius: scale(10),
       elevation: 5,
     }
   },
   fonts: {
     heading: 'Rajdhani-Bold',
     body: 'System',
-  }
+  },
+  // ─── Responsive Helpers ─────────────────────────────────────
+  // Pre-calculated font sizes for common text styles
+  // Used as: fontSize: theme.fontSizes.sm
+  fontSizes: {
+    xs: fs(8),
+    sm: fs(10),
+    md: fs(12),
+    lg: fs(14),
+    xl: fs(16),
+    xxl: fs(20),
+    xxxl: fs(24),
+    display: fs(28),
+    hero: fs(32),
+  },
+  // Pre-calculated icon sizes for common icon sizes
+  iconSizes: {
+    sm: Math.round(scale(14)),
+    md: Math.round(scale(16)),
+    lg: Math.round(scale(20)),
+    xl: Math.round(scale(22)),
+    xxl: Math.round(scale(24)),
+    xxxl: Math.round(scale(28)),
+    huge: Math.round(scale(32)),
+  },
 };

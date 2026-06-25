@@ -11,8 +11,10 @@ import { StatBar } from '../../components/ui/StatBar';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { GlowInput } from '../../components/ui/GlowInput';
 import { theme } from '../../constants/theme';
+import { scale, verticalScale, fontSize } from '../../utils/responsive';
 import { useAuthContext } from '../../context/AuthContext';
 import { TaskService, DailyTask, TaskDifficulty, TaskType, XP_REWARDS } from '../../services/taskService';
+import { StatsService } from '../../services/statsService';
 import {
   Plus, CheckCircle, Circle, Trash2, X, Trophy, Calendar, Edit3, Filter,
 } from 'lucide-react-native';
@@ -120,7 +122,12 @@ export const DailyTasks = React.memo(function DailyTasks() {
     if (!user?.id || !selectedTask) return;
 
     try {
+      // Mark task as completed in the database
       await TaskService.completeTask(selectedTask.id, user.id);
+      
+      // Add the XP reward to the user's actual stats so level can progress
+      await StatsService.addXP(user.id, selectedTask.xp_reward);
+      
       Alert.alert('QUEST COMPLETE!', `You earned +${selectedTask.xp_reward} XP!`);
       setSelectedTask(null);
       loadTasks();
@@ -354,10 +361,10 @@ export const DailyTasks = React.memo(function DailyTasks() {
             />
           </HudContainer>
 
-          {/* FIX 2: All Complete State — hidden when any modal is open */}
+          {/* All Complete State — hidden when any modal is open */}
           {showAllCompleteBanner && (
             <HudContainer style={styles.completeCard} accentColor={theme.colors.success}>
-              <Trophy color={theme.colors.success} size={32} />
+              <Trophy color={theme.colors.success} size={theme.iconSizes.huge} />
               <Text style={styles.completeTitle}>ALL TASKS COMPLETE</Text>
               <Text style={styles.completeSubtitle}>BONUS XP EARNED: +{Math.round(totalXPEarned * 0.2)}</Text>
             </HudContainer>
@@ -368,7 +375,7 @@ export const DailyTasks = React.memo(function DailyTasks() {
             <>
               <SectionHeader
                 title="Daily Tasks"
-                icon={<Calendar color={theme.colors.primary} size={14} />}
+                icon={<Calendar color={theme.colors.primary} size={theme.iconSizes.md} />}
               />
               {dailyTasks.length > 0 ? (
                 dailyTasks.map((item, index) => (
@@ -379,7 +386,7 @@ export const DailyTasks = React.memo(function DailyTasks() {
                       transform: [{
                         translateY: fadeAnim.interpolate({
                           inputRange: [0, 1],
-                          outputRange: [16 * (index % 5), 0],
+                          outputRange: [scale(16 * (index % 5)), 0],
                         }),
                       }],
                     }}
@@ -406,7 +413,7 @@ export const DailyTasks = React.memo(function DailyTasks() {
             <>
               <SectionHeader
                 title="Deadline Tasks"
-                icon={<Calendar color={theme.colors.warning} size={14} />}
+                icon={<Calendar color={theme.colors.warning} size={theme.iconSizes.md} />}
               />
               {deadlineTasks.length > 0 ? (
                 deadlineTasks.map((item, index) => (
@@ -417,7 +424,7 @@ export const DailyTasks = React.memo(function DailyTasks() {
                       transform: [{
                         translateY: fadeAnim.interpolate({
                           inputRange: [0, 1],
-                          outputRange: [16 * (index % 5), 0],
+                          outputRange: [scale(16 * (index % 5)), 0],
                         }),
                       }],
                     }}
@@ -440,14 +447,14 @@ export const DailyTasks = React.memo(function DailyTasks() {
             </>
           )}
 
-          <View style={{ height: 80 }} />
+          <View style={{ height: verticalScale(80) }} />
         </ScrollView>
 
         {/* Add Task FAB */}
         <Button
           variant="fab"
           title=""
-          icon={<Plus color="#080B12" size={28} />}
+          icon={<Plus color="#080B12" size={theme.iconSizes.xxxl} />}
           onPress={() => setShowAddModal(true)}
         />
 
@@ -458,7 +465,7 @@ export const DailyTasks = React.memo(function DailyTasks() {
           animationType="slide"
           onRequestClose={() => setShowAddModal(false)}
         >
-          <View style={styles.modalOverlay}>
+          <BlurView style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               {/* Drag Handle */}
               <View style={styles.dragHandle} />
@@ -466,7 +473,7 @@ export const DailyTasks = React.memo(function DailyTasks() {
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>NEW TASK</Text>
                 <TouchableOpacity onPress={() => setShowAddModal(false)}>
-                  <X color={theme.colors.text.secondary} size={24} />
+                  <X color={theme.colors.text.secondary} size={theme.iconSizes.xxl} />
                 </TouchableOpacity>
               </View>
 
@@ -496,6 +503,8 @@ export const DailyTasks = React.memo(function DailyTasks() {
                     style={[
                       styles.optionBtn,
                       newTaskType === type && styles.optionBtnActive,
+                      { borderColor: type === 'daily' ? '#00E5FF' : '#FF9F0A' },
+                      newTaskType === type && { backgroundColor: (type === 'daily' ? '#00E5FF' : '#FF9F0A') + '20' },
                     ]}
                     onPress={() => setNewTaskType(type)}
                     activeOpacity={1}
@@ -503,6 +512,7 @@ export const DailyTasks = React.memo(function DailyTasks() {
                     <Text style={[
                       styles.optionText,
                       newTaskType === type && styles.optionTextActive,
+                      { color: newTaskType === type ? (type === 'daily' ? '#00E5FF' : '#FF9F0A') : theme.colors.text.secondary },
                     ]}>
                       {type.toUpperCase()}
                     </Text>
@@ -554,7 +564,7 @@ export const DailyTasks = React.memo(function DailyTasks() {
           </BlurView>
         </Modal>
 
-        {/* FIX 4: Task Completion Modal — centered, not bottom-sheet */}
+        {/* Task Completion Modal — centered, not bottom-sheet */}
         <Modal
           visible={!!selectedTask}
           transparent
@@ -602,7 +612,7 @@ export const DailyTasks = React.memo(function DailyTasks() {
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>EDIT TASK</Text>
                 <TouchableOpacity onPress={() => setShowEditModal(false)}>
-                  <X color={theme.colors.text.secondary} size={24} />
+                  <X color={theme.colors.text.secondary} size={theme.iconSizes.xxl} />
                 </TouchableOpacity>
               </View>
 
@@ -664,7 +674,7 @@ export const DailyTasks = React.memo(function DailyTasks() {
                 style={styles.createButton}
               />
             </View>
-          </BlurView>
+          </View>
         </Modal>
       </Animated.View>
     </ScreenWrapper>
@@ -691,16 +701,12 @@ function TaskCard({
 
   return (
     <TouchableOpacity activeOpacity={0.85} onPress={onPress}>
-      <HudContainer
-        blurEnabled={false}
-        style={[styles.taskCard, { borderLeftWidth: 3, borderLeftColor: difficultyColor }]}
-        accentColor={difficultyColor}
-      >
+      <View style={[styles.taskCard, { borderLeftWidth: verticalScale(3), borderLeftColor: difficultyColor }]}>
         <View style={styles.taskCheckArea}>
           {task.completed ? (
-            <CheckCircle color={theme.colors.success} size={24} />
+            <CheckCircle color={theme.colors.success} size={theme.iconSizes.xxl} />
           ) : (
-            <Circle color={theme.colors.text.secondary} size={24} />
+            <Circle color={theme.colors.text.secondary} size={theme.iconSizes.xxl} />
           )}
         </View>
 
@@ -744,7 +750,7 @@ function TaskCard({
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               activeOpacity={0.7}
             >
-              <Edit3 color={theme.colors.primary} size={16} />
+              <Edit3 color={theme.colors.primary} size={theme.iconSizes.md} />
             </TouchableOpacity>
           )}
           <TouchableOpacity
@@ -753,10 +759,10 @@ function TaskCard({
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             activeOpacity={0.7}
           >
-            <Trash2 color={theme.colors.text.secondary} size={16} />
+            <Trash2 color={theme.colors.text.secondary} size={theme.iconSizes.md} />
           </TouchableOpacity>
         </View>
-      </HudContainer>
+      </View>
     </TouchableOpacity>
   );
 }
@@ -768,9 +774,9 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   loadingText: {
     color: theme.colors.text.secondary,
-    fontSize: 14,
+    fontSize: theme.fontSizes.lg,
     fontWeight: '600',
-    letterSpacing: 2,
+    letterSpacing: scale(2),
     marginTop: theme.spacing.md,
   },
 
@@ -795,10 +801,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary + '15',
   },
   dateChipText: {
-    fontSize: 11,
+    fontSize: theme.fontSizes.sm,
     fontWeight: '700',
     color: theme.colors.text.secondary,
-    letterSpacing: 1,
+    letterSpacing: scale(1),
   },
   dateChipTextActive: {
     color: theme.colors.primary,
@@ -821,26 +827,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   categoryChipText: {
-    fontSize: 11,
+    fontSize: theme.fontSizes.sm,
     fontWeight: '700',
     color: theme.colors.text.secondary,
-    letterSpacing: 1,
+    letterSpacing: scale(1),
   },
 
   // Summary HUD
   summaryHud: { marginBottom: theme.spacing.lg },
   summaryRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   summaryLabel: {
-    fontSize: 10,
+    fontSize: theme.fontSizes.sm,
     fontWeight: '700',
     color: theme.colors.text.secondary,
-    letterSpacing: 1.5,
+    letterSpacing: scale(1.5),
   },
   summaryValue: {
-    fontSize: 28,
+    fontSize: theme.fontSizes.display,
     fontWeight: '900',
     color: theme.colors.text.primary,
-    marginTop: 2,
+    marginTop: verticalScale(2),
     fontFamily: theme.fonts.heading,
   },
   summaryMax: { color: theme.colors.text.secondary, fontWeight: '400' },
@@ -853,16 +859,16 @@ const styles = StyleSheet.create({
     borderRadius: theme.border.radius.md,
   },
   xpEarnedValue: {
-    fontSize: 18,
+    fontSize: theme.fontSizes.xxl,
     fontWeight: '900',
     color: theme.colors.primary,
     fontFamily: theme.fonts.heading,
   },
   xpEarnedLabel: {
-    fontSize: 8,
+    fontSize: theme.fontSizes.xs,
     fontWeight: '700',
     color: theme.colors.text.secondary,
-    letterSpacing: 2,
+    letterSpacing: scale(2),
   },
 
   // Complete state
@@ -872,27 +878,29 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   completeTitle: {
-    fontSize: 16,
+    fontSize: theme.fontSizes.xl,
     fontWeight: '900',
     color: theme.colors.success,
-    letterSpacing: 2,
+    letterSpacing: scale(2),
     marginTop: theme.spacing.md,
   },
   completeSubtitle: {
-    fontSize: 11,
+    fontSize: theme.fontSizes.sm,
     fontWeight: '600',
     color: theme.colors.primary,
-    letterSpacing: 1,
+    letterSpacing: scale(1),
     marginTop: theme.spacing.xs,
   },
 
-  // FIX 1: Task Card — padding: 0 removed so HudContainer renders content correctly
   taskCard: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: theme.spacing.sm,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    padding: theme.spacing.md,
+    borderRadius: theme.border.radius.md,
   },
-  taskCheckArea: { marginRight: theme.spacing.md },
+  taskCheckArea: { marginRight: theme.spacing.md, justifyContent: 'center' },
   taskBody: { flex: 1 },
   taskTextBackground: {
     padding: theme.spacing.sm,
@@ -902,46 +910,46 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    marginBottom: verticalScale(4),
     gap: theme.spacing.xs,
   },
   taskTitle: {
-    fontSize: 14,
+    fontSize: theme.fontSizes.lg,
     fontWeight: '600',
     color: theme.colors.text.primary,
-    letterSpacing: 0.5,
+    letterSpacing: scale(0.5),
     flex: 1,
   },
   taskTitleDone: { textDecorationLine: 'line-through', color: theme.colors.text.secondary },
-  taskDesc: { fontSize: 11, color: theme.colors.text.secondary, marginTop: 2 },
+  taskDesc: { fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary, marginTop: verticalScale(2) },
   taskRight: { alignItems: 'flex-end', marginLeft: theme.spacing.sm },
   taskXpBadge: {
     backgroundColor: theme.colors.gold + '15',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingHorizontal: scale(6),
+    paddingVertical: verticalScale(2),
     borderWidth: 1,
     borderColor: theme.colors.gold + '40',
-    borderRadius: 4,
+    borderRadius: scale(4),
   },
-  taskXpText: { fontSize: 10, fontWeight: '700', color: theme.colors.gold, letterSpacing: 1 },
+  taskXpText: { fontSize: theme.fontSizes.sm, fontWeight: '700', color: theme.colors.gold, letterSpacing: scale(1) },
   taskDifficultyBadge: {
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    borderRadius: 4,
+    paddingHorizontal: scale(4),
+    paddingVertical: verticalScale(1),
+    borderRadius: scale(4),
   },
   taskDifficultyText: {
-    fontSize: 8,
+    fontSize: theme.fontSizes.xs,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: scale(1),
   },
   deadlineText: {
-    fontSize: 10,
+    fontSize: theme.fontSizes.sm,
     color: theme.colors.warning,
-    marginTop: 4,
+    marginTop: verticalScale(4),
   },
-  deleteButton: { marginTop: 4 },
+  deleteButton: { marginTop: verticalScale(4) },
   editButton: {
-    marginTop: 4,
+    marginTop: verticalScale(4),
     marginRight: theme.spacing.xs,
   },
 
@@ -949,12 +957,12 @@ const styles = StyleSheet.create({
   emptyState: { alignItems: 'center', paddingVertical: theme.spacing.xxl },
   emptyText: {
     color: theme.colors.text.secondary,
-    fontSize: 14,
+    fontSize: theme.fontSizes.lg,
     fontWeight: '700',
-    letterSpacing: 2,
+    letterSpacing: scale(2),
   },
 
-  // FIX 3: Modal overlay with zIndex so it always renders above background content
+  // Modal overlay with zIndex so it always renders above background content
   modalOverlay: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -963,10 +971,10 @@ const styles = StyleSheet.create({
     elevation: 999,
   },
   dragHandle: {
-    width: 40,
-    height: 4,
+    width: scale(40),
+    height: verticalScale(4),
     backgroundColor: theme.colors.bg.glassBorder,
-    borderRadius: 2,
+    borderRadius: scale(2),
     alignSelf: 'center',
     marginBottom: theme.spacing.lg,
   },
@@ -985,79 +993,91 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   modalTitle: {
-    fontSize: 16,
+    fontSize: theme.fontSizes.xl,
     fontWeight: '900',
     color: theme.colors.text.primary,
-    letterSpacing: 2,
+    letterSpacing: scale(2),
   },
   inputLabel: {
-    fontSize: 10,
+    fontSize: theme.fontSizes.sm,
     fontWeight: '700',
     color: theme.colors.text.secondary,
-    letterSpacing: 1.5,
+    letterSpacing: scale(1.5),
+    marginBottom: theme.spacing.sm,
     marginTop: theme.spacing.md,
+    textTransform: 'uppercase',
   },
-  textAreaInput: {
-    minHeight: 80,
+  optionRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
   },
-  optionRow: { flexDirection: 'row', gap: theme.spacing.sm, marginTop: 4 },
   optionBtn: {
     flex: 1,
-    paddingVertical: theme.spacing.md,
+    height: theme.touch.chipHeight,
     borderWidth: 1,
-    borderColor: theme.colors.bg.glassBorder,
+    borderRadius: theme.border.radius.sm,
     alignItems: 'center',
-    borderRadius: theme.border.radius.md,
+    justifyContent: 'center',
+    flexDirection: 'column',
+    gap: verticalScale(2),
   },
-  optionBtnActive: {
-    borderWidth: 2,
-  },
+  optionBtnActive: {},
   optionText: {
-    fontSize: 12,
+    fontSize: theme.fontSizes.sm,
     fontWeight: '700',
-    color: theme.colors.text.secondary,
-    letterSpacing: 1,
+    letterSpacing: scale(1),
   },
-  optionTextActive: { fontWeight: '900' },
-  xpPreview: { fontSize: 10, fontWeight: '600', color: theme.colors.text.secondary, marginTop: 2 },
-  createButton: { marginTop: theme.spacing.lg },
-
-  // FIX 4: Finish modal — centered in screen with proper margin
+  optionTextActive: {},
+  xpPreview: {
+    fontSize: theme.fontSizes.xs,
+    fontWeight: '600',
+    color: theme.colors.text.secondary,
+  },
+  createButton: {
+    marginTop: theme.spacing.lg,
+  },
+  textAreaInput: {
+    minHeight: verticalScale(80),
+    textAlignVertical: 'top',
+  },
   finishModalContent: {
     backgroundColor: theme.colors.bg.base,
     borderWidth: 1,
-    borderColor: theme.colors.primary,
-    margin: theme.spacing.lg,
-    padding: theme.spacing.lg,
+    borderColor: theme.colors.bg.glassBorder,
     borderRadius: theme.border.radius.lg,
+    padding: theme.spacing.lg,
+    marginHorizontal: theme.spacing.lg,
+    alignItems: 'center',
   },
   finishModalTitle: {
-    fontSize: 15,
+    fontSize: theme.fontSizes.xxl,
     fontWeight: '900',
-    color: theme.colors.text.primary,
-    letterSpacing: 1.5,
-    marginBottom: theme.spacing.sm,
+    color: theme.colors.primary,
+    letterSpacing: scale(2),
+    marginBottom: theme.spacing.md,
   },
   finishTaskTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: theme.colors.primary,
-    marginBottom: theme.spacing.xs,
-  },
-  finishTaskDescription: {
-    fontSize: 12,
-    color: theme.colors.text.secondary,
+    fontSize: theme.fontSizes.lg,
+    fontWeight: '600',
+    color: theme.colors.text.primary,
+    textAlign: 'center',
     marginBottom: theme.spacing.sm,
   },
+  finishTaskDescription: {
+    fontSize: theme.fontSizes.md,
+    color: theme.colors.text.secondary,
+    textAlign: 'center',
+    marginBottom: theme.spacing.md,
+  },
   finishXpText: {
-    fontSize: 12,
+    fontSize: theme.fontSizes.lg,
     fontWeight: '700',
-    color: theme.colors.success,
+    color: theme.colors.gold,
     marginBottom: theme.spacing.lg,
   },
   finishActions: {
     flexDirection: 'row',
-    gap: theme.spacing.sm,
+    gap: theme.spacing.md,
   },
   finishActionButton: {
     flex: 1,

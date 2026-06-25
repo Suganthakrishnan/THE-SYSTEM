@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { ScreenWrapper } from '../../components/layout/ScreenWrapper';
 import { Card } from '../../components/ui/Card';
 import { theme } from '../../constants/theme';
+import { scale, verticalScale, fontSize as fs } from '../../utils/responsive';
 
 export function PendingWorks() {
   return (
@@ -38,21 +39,21 @@ const styles = StyleSheet.create({
     padding: theme.spacing.lg,
   },
   title: {
-    fontSize: 20,
+    fontSize: fs(20),
     fontWeight: '800',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
     marginBottom: theme.spacing.xl,
     letterSpacing: 2,
     textShadowColor: theme.colors.primary,
     textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
+    textShadowRadius: scale(8),
   },
   card: {
     marginBottom: theme.spacing.lg,
   },
   cardTitle: {
     color: theme.colors.primary,
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '700',
     marginBottom: theme.spacing.md,
     letterSpacing: 1,
@@ -63,15 +64,15 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   checkbox: {
-    width: 20,
-    height: 20,
+    width: scale(20),
+    height: scale(20),
     borderWidth: 1,
     borderColor: theme.colors.primary,
     marginRight: theme.spacing.md,
     backgroundColor: 'rgba(0, 240, 255, 0.1)',
   },
   questText: {
-    color: theme.colors.text,
-    fontSize: 16,
+    color: theme.colors.text.primary,
+    fontSize: fs(16),
   }
 });

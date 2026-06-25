@@ -1,5 +1,6 @@
 import React from 'react';
 import { theme } from '../../constants/theme';
+import { scale, verticalScale, fontSize } from '../../utils/responsive';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronRight } from 'lucide-react-native';
@@ -57,7 +58,7 @@ export function Button({
         <View style={styles.contentRow}>
           {icon && <View style={styles.iconWrapper}>{icon}</View>}
           {variant !== 'fab' && (
-            <Text style={[getTextStyle(), textStyle]}>
+            <Text style={[getTextStyle(), textStyle]} numberOfLines={1} ellipsizeMode="tail">
               {title}
             </Text>
           )}
@@ -174,8 +175,9 @@ export function Button({
 const styles = StyleSheet.create({
   container: {
     minHeight: theme.touch.buttonMinHeight,
+    minWidth: scale(80),
     paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.lg,
     borderRadius: theme.border.radius.md,
     alignItems: 'center',
     justifyContent: 'center',
@@ -185,9 +187,9 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   text: {
-    fontSize: 16,
+    fontSize: theme.fontSizes.lg,
     fontWeight: '700',
-    letterSpacing: 2,
+    letterSpacing: scale(1),
     textTransform: 'uppercase',
   },
   contentRow: {
@@ -229,8 +231,8 @@ const styles = StyleSheet.create({
   },
   fabWrapper: {
     position: 'absolute',
-    bottom: 24,
-    right: 24,
+    bottom: verticalScale(24),
+    right: scale(24),
   },
   fab: {
     width: theme.touch.fabSize,

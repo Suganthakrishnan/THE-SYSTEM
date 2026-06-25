@@ -5,14 +5,17 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { theme } from '../../constants/theme';
+import { scale, verticalScale, fontSize as fs } from '../../utils/responsive';
 import { GlowInput } from '../../components/ui/GlowInput';
 import { Button } from '../../components/ui/Button';
 import { useAuthContext } from '../../context/AuthContext';
 import { resetPassword } from '../../services/authService';
 import { sanitizeText, validateEmail } from '../../services/securityService';
+import { useGoogleSignIn } from '../../hooks/useGoogleSignIn';
 
 export function LoginScreen({ navigation }: any) {
   const { signIn, enterDemoMode } = useAuthContext();
+  const { signIn: googleSignIn, isSigningIn: isGoogleSigningIn, error: googleError } = useGoogleSignIn();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -53,10 +56,15 @@ export function LoginScreen({ navigation }: any) {
     // Navigation is handled automatically by AppNavigator auth state
   };
 
-  const handleGoogleStub = () =>
-    Alert.alert('COMING SOON', 'Google authentication is not yet configured. Use email access.', [
-      { text: 'UNDERSTOOD' },
-    ]);
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    const result = await googleSignIn();
+    if (result.error && !result.cancelled) {
+      setError(result.error);
+    }
+    // On success, navigation is handled automatically by AppNavigator
+    // via the onAuthStateChange listener in useAuth.ts
+  };
 
   const handleForgotPassword = async () => {
     if (!email.trim()) {
@@ -100,7 +108,7 @@ export function LoginScreen({ navigation }: any) {
         <LinearGradient colors={['rgba(0,240,255,0.09)', 'transparent']} style={styles.gradientTop} />
         <Animated.View
           style={[styles.scanLine, {
-            transform: [{ translateY: scanAnim.interpolate({ inputRange: [0, 1], outputRange: [-10, 850] }) }],
+            transform: [{ translateY: scanAnim.interpolate({ inputRange: [0, 1], outputRange: [-verticalScale(10), verticalScale(850)] }) }],
           }]}
         />
         {/* HUD corners */}
@@ -175,15 +183,18 @@ export function LoginScreen({ navigation }: any) {
           </View>
 
           <TouchableOpacity 
-            style={styles.googleBtn} 
-            onPress={handleGoogleStub} 
+            style={[styles.googleBtn, (isLoading || isGoogleSigningIn) && { opacity: 0.6 }]} 
+            onPress={handleGoogleSignIn} 
             activeOpacity={0.8}
+            disabled={isLoading || isGoogleSigningIn}
             accessibilityLabel="Continue with Google"
             accessibilityHint="Sign in using your Google account"
             accessibilityRole="button"
           >
             <Text style={styles.googleG}>G</Text>
-            <Text style={styles.googleText}>Continue with Google</Text>
+            <Text style={[styles.googleText, (isLoading || isGoogleSigningIn) && { opacity: 0.6 }]}>
+              {isGoogleSigningIn ? 'SIGNING IN...' : 'Continue with Google'}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -218,50 +229,50 @@ export function LoginScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.bg.base },
-  gradientTop: { position: 'absolute', top: 0, left: 0, right: 0, height: 280 },
-  scanLine: { position: 'absolute', left: 0, right: 0, height: 1, backgroundColor: theme.colors.primary, opacity: 0.07 },
-  corner: { position: 'absolute', width: 22, height: 22, borderColor: theme.colors.primary, opacity: 0.5 },
-  cTL: { top: 22, left: 22, borderTopWidth: 2, borderLeftWidth: 2 },
-  cTR: { top: 22, right: 22, borderTopWidth: 2, borderRightWidth: 2 },
-  cBL: { bottom: 22, left: 22, borderBottomWidth: 2, borderLeftWidth: 2 },
-  cBR: { bottom: 22, right: 22, borderBottomWidth: 2, borderRightWidth: 2 },
+  gradientTop: { position: 'absolute', top: 0, left: 0, right: 0, height: verticalScale(280) },
+  scanLine: { position: 'absolute', left: 0, right: 0, height: verticalScale(1), backgroundColor: theme.colors.primary, opacity: 0.07 },
+  corner: { position: 'absolute', width: scale(22), height: scale(22), borderColor: theme.colors.primary, opacity: 0.5 },
+  cTL: { top: scale(22), left: scale(22), borderTopWidth: 2, borderLeftWidth: 2 },
+  cTR: { top: scale(22), right: scale(22), borderTopWidth: 2, borderRightWidth: 2 },
+  cBL: { bottom: scale(22), left: scale(22), borderBottomWidth: 2, borderLeftWidth: 2 },
+  cBR: { bottom: scale(22), right: scale(22), borderBottomWidth: 2, borderRightWidth: 2 },
   scroll: { flexGrow: 1, padding: theme.spacing.lg, justifyContent: 'center' },
   logoSection: { alignItems: 'center', marginBottom: theme.spacing.xxl },
   badge: {
-    width: 64, height: 64, borderRadius: 16,
+    width: scale(64), height: scale(64), borderRadius: scale(16),
     backgroundColor: theme.colors.bg.glass, borderWidth: 1, borderColor: theme.colors.primary,
     justifyContent: 'center', alignItems: 'center', marginBottom: theme.spacing.md,
     ...theme.glow.cyan,
   },
-  badgeIcon: { fontSize: 28 },
+  badgeIcon: { fontSize: fs(28) },
   logoText: {
-    fontSize: 36, fontWeight: '900', color: theme.colors.primary, letterSpacing: 6,
-    textShadowColor: theme.colors.primary, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 16,
+    fontSize: fs(36), fontWeight: '900', color: theme.colors.primary, letterSpacing: 6,
+    textShadowColor: theme.colors.primary, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: scale(16),
     fontFamily: theme.fonts.heading,
   },
-  logoSub: { fontSize: 9, color: theme.colors.text.secondary, letterSpacing: 2, marginTop: theme.spacing.xs },
-  divider: { width: 40, height: 1.5, backgroundColor: theme.colors.primary, marginTop: theme.spacing.md, opacity: 0.6 },
+  logoSub: { fontSize: fs(9), color: theme.colors.text.secondary, letterSpacing: 2, marginTop: theme.spacing.xs },
+  divider: { width: scale(40), height: verticalScale(1.5), backgroundColor: theme.colors.primary, marginTop: theme.spacing.md, opacity: 0.6 },
   errorBox: {
     backgroundColor: theme.colors.danger + '15', borderWidth: 1, borderColor: theme.colors.danger,
     borderRadius: theme.border.radius.md, padding: theme.spacing.md, marginBottom: theme.spacing.md,
   },
-  errorText: { color: theme.colors.danger, fontSize: 13, fontWeight: '600' },
+  errorText: { color: theme.colors.danger, fontSize: fs(13), fontWeight: '600' },
   forgotBtn: { alignSelf: 'flex-end', marginBottom: theme.spacing.lg, marginTop: -theme.spacing.sm },
-  forgotText: { fontSize: 11, color: theme.colors.secondary, letterSpacing: 1 },
+  forgotText: { fontSize: fs(11), color: theme.colors.secondary, letterSpacing: 1 },
   primaryBtn: { marginBottom: theme.spacing.md },
   orRow: { flexDirection: 'row', alignItems: 'center', marginVertical: theme.spacing.md, gap: theme.spacing.md },
-  orLine: { flex: 1, height: 1, backgroundColor: theme.colors.bg.glassBorder },
-  orText: { color: theme.colors.text.secondary, fontSize: 12, letterSpacing: 2 },
+  orLine: { flex: 1, height: verticalScale(1), backgroundColor: theme.colors.bg.glassBorder },
+  orText: { color: theme.colors.text.secondary, fontSize: fs(12), letterSpacing: 2 },
   googleBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     backgroundColor: theme.colors.bg.glass, borderWidth: 1, borderColor: theme.colors.bg.glassBorder,
     borderRadius: theme.border.radius.md, paddingVertical: theme.spacing.md, marginBottom: theme.spacing.lg, gap: theme.spacing.sm,
   },
-  googleG: { fontSize: 18, fontWeight: '900', color: '#4285F4' },
-  googleText: { color: theme.colors.text.primary, fontSize: 15, fontWeight: '600' },
+  googleG: { fontSize: fs(18), fontWeight: '900', color: '#4285F4' },
+  googleText: { color: theme.colors.text.primary, fontSize: fs(15), fontWeight: '600' },
   linkRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: theme.spacing.sm },
-  linkPrompt: { color: theme.colors.text.secondary, fontSize: 13, letterSpacing: 1 },
-  linkAction: { color: theme.colors.primary, fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  linkPrompt: { color: theme.colors.text.secondary, fontSize: fs(13), letterSpacing: 1 },
+  linkAction: { color: theme.colors.primary, fontSize: fs(13), fontWeight: '700', letterSpacing: 1 },
   demoBtn: {
     marginTop: theme.spacing.xl,
     paddingVertical: theme.spacing.md,
@@ -273,14 +284,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary + '15',
   },
   demoText: { 
-    fontSize: 12, 
+    fontSize: fs(12), 
     fontWeight: '700', 
     color: theme.colors.primary, 
     letterSpacing: 1.5,
     marginBottom: theme.spacing.xs,
   },
   demoSub: { 
-    fontSize: 10, 
+    fontSize: fs(10), 
     color: theme.colors.text.secondary, 
     letterSpacing: 1,
   },

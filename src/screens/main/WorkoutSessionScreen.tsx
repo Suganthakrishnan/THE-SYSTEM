@@ -6,6 +6,7 @@ import { ScreenWrapper } from '../../components/layout/ScreenWrapper';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { theme } from '../../constants/theme';
+import { scale, verticalScale, fontSize as fs } from '../../utils/responsive';
 import { useAuthContext } from '../../context/AuthContext';
 import {
   WorkoutPlannerService, CustomWorkoutPlan, WorkoutSession, CompletedExercise,
@@ -35,22 +36,32 @@ export function WorkoutSessionScreen({ route, navigation }: { route: { params: R
 
   useEffect(() => {
     const initSession = async () => {
-      await WorkoutPlannerService.initialize(user?.id);
-      const plan = WorkoutPlannerService.getWorkoutById(workoutId);
-      if (!plan) {
-        Alert.alert('ERROR', 'Workout not found', [{ text: 'OK', onPress: () => navigation.goBack() }]);
-        return;
-      }
-      setWorkout(plan);
-      const s = WorkoutPlannerService.startSession(workoutId);
-      setSession(s);
-      setCompletedExercises(
-        plan.exercises.map(ex => ({ ...ex, completed: false })),
-      );
+      try {
+        await WorkoutPlannerService.initialize(user?.id);
+        const plan = WorkoutPlannerService.getWorkoutById(workoutId);
+        if (!plan) {
+          Alert.alert('ERROR', 'Workout not found', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+          return;
+        }
+        setWorkout(plan);
+        const s = WorkoutPlannerService.startSession(workoutId);
+        if (!s) {
+          console.error('[WorkoutSessionScreen] startSession returned null for', workoutId);
+          Alert.alert('SESSION ERROR', 'Unable to start workout session.', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+          return;
+        }
+        setSession(s);
+        setCompletedExercises(
+          plan.exercises.map(ex => ({ ...ex, completed: false })),
+        );
 
-      timerRef.current = setInterval(() => {
-        setElapsedSec(Math.floor((Date.now() - startTimeRef.current) / 1000));
-      }, 1000);
+        timerRef.current = setInterval(() => {
+          setElapsedSec(Math.floor((Date.now() - startTimeRef.current) / 1000));
+        }, 1000);
+      } catch (err) {
+        console.error('[WorkoutSessionScreen] initSession failed', err);
+        Alert.alert('SESSION ERROR', 'An unexpected error occurred while starting the session.', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+      }
     };
 
     initSession();
@@ -188,7 +199,7 @@ export function WorkoutSessionScreen({ route, navigation }: { route: { params: R
               { text: 'END', style: 'destructive', onPress: () => navigation.goBack() },
             ]);
           }}>
-            <X color={theme.colors.danger} size={24} />
+            <X color={theme.colors.danger} size={theme.iconSizes.xxl} />
           </TouchableOpacity>
           <Text style={styles.workoutName}>{workout.name}</Text>
           <Text style={styles.timerText}>{formatTime(elapsedSec)}</Text>
@@ -226,11 +237,11 @@ export function WorkoutSessionScreen({ route, navigation }: { route: { params: R
 
           <View style={styles.metaRow}>
             <View style={styles.metaItem}>
-              <Flame color={theme.colors.warning} size={14} />
+              <Flame color={theme.colors.warning} size={theme.iconSizes.sm} />
               <Text style={styles.metaText}>{currentExercise.calories ?? 0} kcal</Text>
             </View>
             <View style={styles.metaItem}>
-              <Timer color={theme.colors.primary} size={14} />
+              <Timer color={theme.colors.primary} size={theme.iconSizes.sm} />
               <Text style={styles.metaText}>Rest {restDuration}s</Text>
             </View>
           </View>
@@ -250,7 +261,7 @@ export function WorkoutSessionScreen({ route, navigation }: { route: { params: R
           <Text style={styles.upNextTitle}>UP NEXT</Text>
           {workout.exercises.slice(exerciseIndex + 1, exerciseIndex + 4).map((ex, i) => (
             <View key={ex.id} style={styles.upNextItem}>
-              <Dumbbell color={theme.colors.textDimmed} size={14} />
+              <Dumbbell color={theme.colors.textDimmed} size={theme.iconSizes.sm} />
               <Text style={styles.upNextName}>{ex.name}</Text>
             </View>
           ))}
@@ -259,7 +270,7 @@ export function WorkoutSessionScreen({ route, navigation }: { route: { params: R
 
       <Modal visible={isResting} transparent animationType="fade">
         <View style={styles.restOverlay}>
-          <Timer color={theme.colors.primary} size={48} />
+          <Timer color={theme.colors.primary} size={scale(48)} />
           <Text style={styles.restTitle}>REST</Text>
           <Text style={styles.restTimer}>{restSecondsLeft}s</Text>
           <Text style={styles.restNext}>Next: {currentExercise.name}</Text>
@@ -273,32 +284,32 @@ export function WorkoutSessionScreen({ route, navigation }: { route: { params: R
 const styles = StyleSheet.create({
   container: { flex: 1 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: theme.colors.textDimmed, letterSpacing: 2 },
+  loadingText: { color: theme.colors.textDimmed, letterSpacing: scale(2) },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
   },
-  workoutName: { flex: 1, fontSize: 14, fontWeight: '700', color: theme.colors.text.primary, letterSpacing: 1 },
-  timerText: { fontSize: 16, fontWeight: '900', color: theme.colors.primary },
-  progressTrack: { height: 3, backgroundColor: 'rgba(255,255,255,0.08)', marginHorizontal: theme.spacing.lg },
+  workoutName: { flex: 1, fontSize: fs(14), fontWeight: '700', color: theme.colors.text.primary, letterSpacing: scale(1) },
+  timerText: { fontSize: fs(16), fontWeight: '900', color: theme.colors.primary },
+  progressTrack: { height: verticalScale(3), backgroundColor: 'rgba(255,255,255,0.08)', marginHorizontal: theme.spacing.lg },
   progressFill: { height: '100%', backgroundColor: theme.colors.primary },
   content: { flex: 1, padding: theme.spacing.lg },
-  exerciseLabel: { fontSize: 10, color: theme.colors.textDimmed, letterSpacing: 2 },
-  exerciseName: { fontSize: 28, fontWeight: '900', color: theme.colors.text.primary, marginVertical: theme.spacing.sm },
-  instructions: { fontSize: 13, color: theme.colors.textDimmed, lineHeight: 20, marginBottom: theme.spacing.lg },
+  exerciseLabel: { fontSize: fs(10), color: theme.colors.textDimmed, letterSpacing: scale(2) },
+  exerciseName: { fontSize: fs(28), fontWeight: '900', color: theme.colors.text.primary, marginVertical: theme.spacing.sm },
+  instructions: { fontSize: fs(13), color: theme.colors.textDimmed, lineHeight: fs(20), marginBottom: theme.spacing.lg },
   setCard: { padding: theme.spacing.lg, marginBottom: theme.spacing.md, alignItems: 'center' },
-  setLabel: { fontSize: 12, color: theme.colors.secondary, letterSpacing: 2 },
-  setDetail: { fontSize: 24, fontWeight: '900', color: theme.colors.primary, marginTop: theme.spacing.sm },
+  setLabel: { fontSize: fs(12), color: theme.colors.secondary, letterSpacing: scale(2) },
+  setDetail: { fontSize: fs(24), fontWeight: '900', color: theme.colors.primary, marginTop: theme.spacing.sm },
   metaRow: { flexDirection: 'row', gap: theme.spacing.lg, marginBottom: theme.spacing.lg },
-  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  metaText: { fontSize: 12, color: theme.colors.textDimmed },
+  metaItem: { flexDirection: 'row', alignItems: 'center', gap: scale(6) },
+  metaText: { fontSize: fs(12), color: theme.colors.textDimmed },
   primaryBtn: { marginBottom: theme.spacing.sm },
   skipBtn: { marginBottom: theme.spacing.xl },
-  upNextTitle: { fontSize: 10, fontWeight: '700', color: theme.colors.textDimmed, letterSpacing: 2, marginBottom: theme.spacing.sm },
+  upNextTitle: { fontSize: fs(10), fontWeight: '700', color: theme.colors.textDimmed, letterSpacing: scale(2), marginBottom: theme.spacing.sm },
   upNextItem: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm, paddingVertical: theme.spacing.sm },
-  upNextName: { fontSize: 13, color: theme.colors.textDimmed },
+  upNextName: { fontSize: fs(13), color: theme.colors.textDimmed },
   restOverlay: {
     flex: 1,
     backgroundColor: 'rgba(14, 14, 16, 0.95)',
@@ -306,7 +317,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: theme.spacing.xl,
   },
-  restTitle: { fontSize: 14, fontWeight: '700', color: theme.colors.textDimmed, letterSpacing: 3, marginTop: theme.spacing.lg },
-  restTimer: { fontSize: 72, fontWeight: '900', color: theme.colors.primary, marginVertical: theme.spacing.md },
-  restNext: { fontSize: 12, color: theme.colors.textDimmed },
+  restTitle: { fontSize: fs(14), fontWeight: '700', color: theme.colors.textDimmed, letterSpacing: scale(3), marginTop: theme.spacing.lg },
+  restTimer: { fontSize: fs(72), fontWeight: '900', color: theme.colors.primary, marginVertical: theme.spacing.md },
+  restNext: { fontSize: fs(12), color: theme.colors.textDimmed },
 });

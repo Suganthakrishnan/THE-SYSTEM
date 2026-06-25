@@ -10,7 +10,9 @@ import { StatBar } from '../../components/ui/StatBar';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { AnimatedCounter } from '../../components/ui/AnimatedCounter';
 import { theme } from '../../constants/theme';
+import { scale, verticalScale, fontSize } from '../../utils/responsive';
 import { useAuthContext } from '../../context/AuthContext';
+import { useIsFocused } from '@react-navigation/native';
 import { StatsService, DailyProgressService } from '../../services/statsService';
 import { TaskService } from '../../services/taskService';
 import type { UserStats, DailyProgress } from '../../services/statsService';
@@ -77,6 +79,7 @@ export const HomeDashboard = React.memo(function HomeDashboard({ navigation }: a
   const { user } = useAuthContext();
   const pulseAnim = useRef(new Animated.Value(0.4)).current;
   const fadeAnim  = useRef(new Animated.Value(0)).current;
+  const isInitialFocus = useRef(true);
   const [reduceMotionEnabled, setReduceMotionEnabled] = useState(false);
   
   // State for real data
@@ -90,6 +93,19 @@ export const HomeDashboard = React.memo(function HomeDashboard({ navigation }: a
   useEffect(() => {
     loadDashboardData();
   }, [user]);
+
+  // Refresh data every time the screen comes into focus (navigating back from DailyTasks, Workout, etc.)
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    // Skip the first mount — loadDashboardData() is already called by the mount effect above
+    if (isInitialFocus.current) {
+      isInitialFocus.current = false;
+      return;
+    }
+    if (isFocused && user?.id) {
+      loadDashboardData();
+    }
+  }, [isFocused]);
 
   const loadDashboardData = async () => {
     if (!user?.id) return;
@@ -261,8 +277,8 @@ export const HomeDashboard = React.memo(function HomeDashboard({ navigation }: a
               </View>
               <View style={styles.levelBanner}>
                 <ProgressRing
-                  size={100}
-                  strokeWidth={8}
+                  size={Math.round(scale(100))}
+                  strokeWidth={Math.round(scale(8))}
                   progress={playerData.xp / playerData.xpToNext}
                   color={theme.colors.primary}
                   value={`${playerData.level}`}
@@ -290,7 +306,7 @@ export const HomeDashboard = React.memo(function HomeDashboard({ navigation }: a
           {/* ══════ STAT GRID (3×2) ══════ */}
           <SectionHeader
             title="Player Stats"
-            icon={<Shield color={theme.colors.primary} size={14} />}
+            icon={<Shield color={theme.colors.primary} size={theme.iconSizes.md} />}
           />
           <View style={styles.statGrid}>
             {statsData.map((stat) => {
@@ -299,7 +315,7 @@ export const HomeDashboard = React.memo(function HomeDashboard({ navigation }: a
                 <HudContainer key={stat.key} style={styles.statCard}>
                   <View style={styles.statHeader}>
                     <View style={[styles.statIconWrap, { borderColor: stat.color + '40' }]}>
-                      <Icon color={stat.color} size={16} />
+                      <Icon color={stat.color} size={theme.iconSizes.md} />
                     </View>
                     <Text style={[styles.statValue, { color: stat.color }]}>{stat.value}</Text>
                   </View>
@@ -324,29 +340,29 @@ export const HomeDashboard = React.memo(function HomeDashboard({ navigation }: a
           {/* ══════ TODAY'S PROGRESS RINGS ══════ */}
           <SectionHeader
             title="Today's Progress"
-            icon={<Flame color={theme.colors.primary} size={14} />}
+            icon={<Flame color={theme.colors.primary} size={theme.iconSizes.md} />}
           />
           <HudContainer style={styles.progressCard}>
             <View style={styles.ringsRow}>
               <ProgressRing
-                size={90}
-                strokeWidth={8}
+                size={Math.round(scale(90))}
+                strokeWidth={Math.round(scale(8))}
                 progress={progressData.calories.current / progressData.calories.goal}
                 color={theme.colors.danger}
                 value={`${progressData.calories.current}`}
                 label="KCAL"
               />
               <ProgressRing
-                size={90}
-                strokeWidth={8}
+                size={Math.round(scale(90))}
+                strokeWidth={Math.round(scale(8))}
                 progress={progressData.workout.current / progressData.workout.goal}
                 color={theme.colors.primary}
                 value={`${progressData.workout.current}`}
                 label="MIN"
               />
               <ProgressRing
-                size={90}
-                strokeWidth={8}
+                size={Math.round(scale(90))}
+                strokeWidth={Math.round(scale(8))}
                 progress={progressData.water.current / progressData.water.goal}
                 color={theme.colors.success}
                 value={`${progressData.water.current}`}
@@ -363,7 +379,7 @@ export const HomeDashboard = React.memo(function HomeDashboard({ navigation }: a
           {/* ══════ DAILY QUESTS PREVIEW ══════ */}
           <SectionHeader
             title="Active Quests"
-            icon={<CheckCircle color={theme.colors.primary} size={14} />}
+            icon={<CheckCircle color={theme.colors.primary} size={theme.iconSizes.md} />}
             actionLabel="VIEW ALL"
             onAction={() => navigation.navigate('DailyTasks')}
           />
@@ -373,7 +389,7 @@ export const HomeDashboard = React.memo(function HomeDashboard({ navigation }: a
             return (
               <HudContainer
                 key={q.id}
-                style={[styles.questCard, { borderLeftWidth: 3, borderLeftColor: difficultyColor }]}
+                style={[styles.questCard, { borderLeftWidth: verticalScale(3), borderLeftColor: difficultyColor }]}
                 accentColor={difficultyColor}
               >
                 <TouchableOpacity
@@ -387,10 +403,10 @@ export const HomeDashboard = React.memo(function HomeDashboard({ navigation }: a
                 >
                   <View style={styles.questLeft}>
                     {q.done ? (
-                      <CheckCircle color={theme.colors.success} size={20} />
+                      <CheckCircle color={theme.colors.success} size={theme.iconSizes.xxl} />
                     ) : (
                       <View style={styles.questProgressContainer}>
-                        <Circle color={theme.colors.text.secondary} size={20} />
+                        <Circle color={theme.colors.text.secondary} size={theme.iconSizes.xxl} />
                         <Text style={styles.progressNumbers}>{q.current}/{q.target}</Text>
                       </View>
                     )}
@@ -408,7 +424,7 @@ export const HomeDashboard = React.memo(function HomeDashboard({ navigation }: a
           {/* ══════ QUICK ACTIONS ══════ */}
           <SectionHeader
             title="Quick Actions"
-            icon={<Zap color={theme.colors.primary} size={14} />}
+            icon={<Zap color={theme.colors.primary} size={theme.iconSizes.md} />}
           />
           <ScrollView
             horizontal
@@ -428,16 +444,16 @@ export const HomeDashboard = React.memo(function HomeDashboard({ navigation }: a
                   accessibilityRole="button"
                 >
                   <View style={[styles.quickIconWrap, { borderColor: action.color, backgroundColor: action.color + '15' }]}>
-                    <Icon color={action.color} size={22} />
+                    <Icon color={action.color} size={theme.iconSizes.xl} />
                   </View>
                   <Text style={styles.quickLabel}>{action.label}</Text>
-                  <ChevronRight color={action.color} size={12} style={{ marginTop: 6 }} />
+                  <ChevronRight color={action.color} size={theme.iconSizes.sm} style={{ marginTop: scale(6) }} />
                 </TouchableOpacity>
               );
             })}
           </ScrollView>
 
-          <View style={{ height: 32 }} />
+          <View style={{ height: verticalScale(32) }} />
         </ScrollView>
       </Animated.View>
     </ScreenWrapper>
@@ -470,35 +486,35 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   appName: {
-    fontSize: 14,
+    fontSize: theme.fontSizes.lg,
     fontWeight: '900',
     color: theme.colors.primary,
-    letterSpacing: 3,
+    letterSpacing: scale(3),
     fontFamily: theme.fonts.heading,
   },
   greeting: {
-    fontSize: 12,
+    fontSize: theme.fontSizes.md,
     fontWeight: '600',
     color: theme.colors.text.secondary,
-    letterSpacing: 2,
+    letterSpacing: scale(2),
     marginTop: theme.spacing.xs,
   },
   playerName: {
-    fontSize: 28,
+    fontSize: theme.fontSizes.display,
     fontWeight: '900',
     color: theme.colors.text.primary,
-    letterSpacing: 3,
-    marginTop: 2,
+    letterSpacing: scale(3),
+    marginTop: verticalScale(2),
     fontFamily: theme.fonts.heading,
   },
   levelBanner: {
     alignItems: 'center',
   },
   dateText: {
-    fontSize: 10,
+    fontSize: theme.fontSizes.sm,
     fontWeight: '600',
     color: theme.colors.text.secondary,
-    letterSpacing: 2,
+    letterSpacing: scale(2),
     marginTop: theme.spacing.md,
   },
 
@@ -509,42 +525,42 @@ const styles = StyleSheet.create({
   xpLabelRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: scale(8),
   },
   statusDot: {
-    width: 6,
-    height: 6,
+    width: scale(6),
+    height: scale(6),
     backgroundColor: theme.colors.success,
-    marginRight: 6,
-    borderRadius: 3,
+    marginRight: scale(6),
+    borderRadius: scale(3),
   },
   systemActive: {
-    fontSize: 10,
+    fontSize: theme.fontSizes.sm,
     fontWeight: '700',
     color: theme.colors.success,
-    letterSpacing: 1.5,
+    letterSpacing: scale(1.5),
     flex: 1,
   },
   xpText: {
-    fontSize: 10,
+    fontSize: theme.fontSizes.sm,
     fontWeight: '700',
     color: theme.colors.primary,
-    letterSpacing: 1,
+    letterSpacing: scale(1),
   },
   xpTrack: {
-    height: 6,
+    height: scale(6),
     backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 3,
+    borderRadius: scale(3),
     overflow: 'hidden',
   },
   xpFill: {
     height: '100%',
     backgroundColor: theme.colors.primary,
-    borderRadius: 3,
+    borderRadius: scale(3),
     shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
-    shadowRadius: 4,
+    shadowRadius: scale(4),
     elevation: 3,
   },
 
@@ -563,41 +579,41 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: scale(8),
   },
   statIconWrap: {
-    width: 32,
-    height: 32,
+    width: scale(32),
+    height: scale(32),
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: scale(8),
     alignItems: 'center',
     justifyContent: 'center',
   },
   statValue: {
-    fontSize: 24,
+    fontSize: theme.fontSizes.xxxl,
     fontWeight: '900',
     fontFamily: theme.fonts.heading,
   },
   statLabel: {
-    fontSize: 9,
+    fontSize: theme.fontSizes.xs,
     fontWeight: '700',
     color: theme.colors.text.secondary,
-    letterSpacing: 1.5,
+    letterSpacing: scale(1.5),
     textTransform: 'uppercase',
-    marginBottom: 8,
+    marginBottom: scale(8),
   },
   miniBar: {
-    height: 4,
+    height: scale(4),
     backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 2,
+    borderRadius: scale(2),
     overflow: 'hidden',
   },
   miniBarFill: {
     height: '100%',
-    borderRadius: 2,
+    borderRadius: scale(2),
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
-    shadowRadius: 3,
+    shadowRadius: scale(3),
     elevation: 2,
   },
 
@@ -621,15 +637,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   legendDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginRight: 6,
+    width: scale(6),
+    height: scale(6),
+    borderRadius: scale(3),
+    marginRight: scale(6),
   },
   legendText: {
-    fontSize: 10,
+    fontSize: theme.fontSizes.sm,
     color: theme.colors.text.secondary,
-    letterSpacing: 1,
+    letterSpacing: scale(1),
   },
 
   // Quests Preview
@@ -651,10 +667,10 @@ const styles = StyleSheet.create({
   },
   questTitle: {
     color: theme.colors.text.primary,
-    fontSize: 14,
+    fontSize: theme.fontSizes.lg,
     fontWeight: '500',
     marginLeft: theme.spacing.md,
-    letterSpacing: 0.5,
+    letterSpacing: scale(0.5),
   },
   questDone: {
     textDecorationLine: 'line-through',
@@ -662,17 +678,17 @@ const styles = StyleSheet.create({
   },
   xpBadge: {
     backgroundColor: theme.colors.gold + '15',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
+    paddingHorizontal: scale(10),
+    paddingVertical: scale(4),
+    borderRadius: scale(6),
     borderWidth: 1,
     borderColor: theme.colors.gold + '40',
   },
   xpBadgeText: {
-    fontSize: 10,
+    fontSize: theme.fontSizes.sm,
     fontWeight: '700',
     color: theme.colors.gold,
-    letterSpacing: 1,
+    letterSpacing: scale(1),
   },
 
   // Quick Actions
@@ -681,7 +697,7 @@ const styles = StyleSheet.create({
     paddingBottom: theme.spacing.sm,
   },
   quickCard: {
-    width: 110,
+    width: scale(110),
     minHeight: theme.touch.buttonMinHeight,
     padding: theme.spacing.md,
     backgroundColor: theme.colors.bg.glass,
@@ -691,21 +707,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quickIconWrap: {
-    width: 44,
-    height: 44,
+    width: scale(44),
+    height: scale(44),
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: scale(12),
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: theme.spacing.sm,
   },
   quickLabel: {
-    fontSize: 9,
+    fontSize: theme.fontSizes.xs,
     fontWeight: '800',
     color: theme.colors.text.primary,
-    letterSpacing: 1.5,
+    letterSpacing: scale(1.5),
     textAlign: 'center',
-    lineHeight: 14,
+    lineHeight: fontSize(14),
   },
   
   // Quest progress styles
@@ -716,7 +732,7 @@ const styles = StyleSheet.create({
   },
   progressNumbers: {
     position: 'absolute',
-    fontSize: 8,
+    fontSize: theme.fontSizes.xs,
     fontWeight: '700',
     color: theme.colors.text.primary,
     textAlign: 'center',

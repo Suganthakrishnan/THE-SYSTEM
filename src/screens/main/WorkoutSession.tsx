@@ -10,6 +10,7 @@ import { Button } from '../../components/ui/Button';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { ProgressRing } from '../../components/ui/ProgressRing';
 import { theme } from '../../constants/theme';
+import { scale, verticalScale, fontSize as fs, lineHeight } from '../../utils/responsive';
 import { useAuthContext } from '../../context/AuthContext';
 import { WorkoutPlannerService } from '../../services/workoutPlannerService';
 import type { CustomWorkoutPlan, CustomExercise } from '../../services/workoutPlannerService';
@@ -89,6 +90,27 @@ export function WorkoutSession({ route, navigation }: any) {
   const { user } = useAuthContext();
   const { workoutId } = route?.params ?? {};
   
+  // Safe navigation helper to prevent crashes if navigation is undefined
+  const safeGoBack = () => {
+    try {
+      if (navigation?.goBack) {
+        navigation.goBack();
+      }
+    } catch (e) {
+      console.warn('[WorkoutSession] navigation.goBack failed:', e);
+    }
+  };
+  
+  const navigateTo = (screen: string, params?: Record<string, any>) => {
+    try {
+      if (navigation?.navigate) {
+        navigation.navigate(screen, params);
+      }
+    } catch (e) {
+      console.warn(`[WorkoutSession] navigation.navigate('${screen}') failed:`, e);
+    }
+  };
+  
   // Workout state
   const [workout, setWorkout] = useState<CustomWorkoutPlan | null>(null);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
@@ -114,25 +136,32 @@ export function WorkoutSession({ route, navigation }: any) {
   // Load workout
   useEffect(() => {
     const loadWorkout = async () => {
-      if (!workoutId) {
-        Alert.alert('SESSION ERROR', 'Unable to start workout session.', [
-          { text: 'OK', onPress: () => navigation.goBack() },
-        ]);
-        return;
-      }
+      try {
+        if (!workoutId) {
+          Alert.alert('SESSION ERROR', 'Unable to start workout session.', [
+            { text: 'OK', onPress: safeGoBack },
+          ]);
+          return;
+        }
 
-      await WorkoutPlannerService.initialize(user?.id);
-      const loadedWorkout = WorkoutPlannerService.getWorkoutById(workoutId);
-      if (!loadedWorkout) {
-        Alert.alert('WORKOUT NOT FOUND', 'This workout could not be loaded.', [
-          { text: 'OK', onPress: () => navigation.goBack() },
-        ]);
-        return;
-      }
+        await WorkoutPlannerService.initialize(user?.id);
+        const loadedWorkout = WorkoutPlannerService.getWorkoutById(workoutId);
+        if (!loadedWorkout) {
+          Alert.alert('WORKOUT NOT FOUND', 'This workout could not be loaded.', [
+            { text: 'OK', onPress: safeGoBack },
+          ]);
+          return;
+        }
 
-      setWorkout(loadedWorkout);
-      setTotalCalories(loadedWorkout.estimatedCalories || 0);
-      setTotalDuration(loadedWorkout.duration || 0);
+        setWorkout(loadedWorkout);
+        setTotalCalories(loadedWorkout.estimatedCalories || 0);
+        setTotalDuration(loadedWorkout.duration || 0);
+      } catch (err) {
+        console.error('[WorkoutSession] loadWorkout failed', err);
+        Alert.alert('SESSION ERROR', 'An unexpected error occurred while starting the workout.', [
+          { text: 'OK', onPress: safeGoBack },
+        ]);
+      }
     };
     loadWorkout();
   }, [workoutId, navigation, user?.id]);
@@ -190,13 +219,13 @@ export function WorkoutSession({ route, navigation }: any) {
       Animated.timing(messageAnimation, {
         toValue: 1,
         duration: 300,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
       Animated.delay(2000),
       Animated.timing(messageAnimation, {
         toValue: 0,
         duration: 300,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
     ]).start(() => {
       setShowMessage(false);
@@ -235,7 +264,7 @@ export function WorkoutSession({ route, navigation }: any) {
     }
     
     setTimeout(() => {
-      navigation.goBack();
+      safeGoBack();
     }, 3000);
   };
 
@@ -372,17 +401,17 @@ export function WorkoutSession({ route, navigation }: any) {
                   'Your progress will be lost. Are you sure?',
                   [
                     { text: 'CANCEL', style: 'cancel' },
-                    { text: 'EXIT', style: 'destructive', onPress: () => navigation.goBack() },
+                    { text: 'EXIT', style: 'destructive', onPress: safeGoBack },
                   ]
                 );
               } else {
-                navigation.goBack();
+                safeGoBack();
               }
             }}>
               <X color={theme.colors.textDimmed} size={24} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>{workout.name}</Text>
-            <View style={{ width: 24 }} />
+            <View style={{ width: scale(24) }} />
           </View>
           
           {/* Digital Timer */}
@@ -508,7 +537,7 @@ export function WorkoutSession({ route, navigation }: any) {
             })}
           </View>
           
-          <View style={{ height: 100 }} />
+          <View style={{ height: verticalScale(100) }} />
         </ScrollView>
 
         {/* Floating Action Button */}
@@ -532,7 +561,7 @@ export function WorkoutSession({ route, navigation }: any) {
           )}
           
           {workoutStatus === 'completed' && (
-            <TouchableOpacity style={styles.fab} onPress={() => navigation.goBack()}>
+            <TouchableOpacity style={styles.fab} onPress={safeGoBack}>
               <CheckCircle2 color={theme.colors.background} size={28} />
             </TouchableOpacity>
           )}
@@ -604,9 +633,9 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: fs(18),
     fontWeight: '900',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
     letterSpacing: 2,
   },
   timerContainer: {
@@ -614,9 +643,9 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.xl,
   },
   timerText: {
-    fontSize: 48,
+    fontSize: fs(48),
     fontWeight: '900',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
     letterSpacing: 4,
   },
   
@@ -634,14 +663,14 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   exerciseNumber: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '700',
     color: theme.colors.primary,
     letterSpacing: 2,
     marginBottom: theme.spacing.xs,
   },
   exerciseName: {
-    fontSize: 20,
+    fontSize: fs(20),
     fontWeight: '900',
     color: theme.colors.text.primary,
     letterSpacing: 1,
@@ -658,15 +687,15 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.05)',
   },
   detailLabel: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '700',
     color: theme.colors.textDimmed,
     letterSpacing: 1,
   },
   detailValue: {
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '600',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
   },
   detailInput: {
     flexDirection: 'row',
@@ -674,17 +703,17 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
   },
   input: {
-    width: 60,
+    width: scale(60),
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.primary,
-    color: theme.colors.text,
-    fontSize: 14,
+    color: theme.colors.text.primary,
+    fontSize: fs(14),
     fontWeight: '600',
     textAlign: 'right',
-    paddingVertical: 2,
+    paddingVertical: verticalScale(2),
   },
   unit: {
-    fontSize: 12,
+    fontSize: fs(12),
     color: theme.colors.textDimmed,
   },
   instructionsContainer: {
@@ -694,16 +723,16 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(255,255,255,0.05)',
   },
   instructionsTitle: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '700',
     color: theme.colors.textDimmed,
     letterSpacing: 1.5,
     marginBottom: theme.spacing.xs,
   },
   instructionsText: {
-    fontSize: 12,
+    fontSize: fs(12),
     color: theme.colors.textDimmed,
-    lineHeight: 18,
+    lineHeight: lineHeight(fs(12)),
   },
   
   // Rest card
@@ -717,7 +746,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.lg,
   },
   restTitle: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '700',
     color: theme.colors.textDimmed,
     letterSpacing: 2,
@@ -725,7 +754,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xs,
   },
   restTimer: {
-    fontSize: 48,
+    fontSize: fs(48),
     fontWeight: '900',
     color: theme.colors.primary,
     marginBottom: theme.spacing.md,
@@ -785,9 +814,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   exerciseImage: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: scale(48),
+    height: scale(48),
+    borderRadius: scale(24),
     backgroundColor: 'rgba(109, 221, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -797,13 +826,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   exerciseListItemName: {
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '600',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
     marginBottom: 2,
   },
   exerciseListItemProgress: {
-    fontSize: 12,
+    fontSize: fs(12),
     color: theme.colors.textDimmed,
   },
   exerciseMenuBtn: {
@@ -834,13 +863,13 @@ const styles = StyleSheet.create({
   optionItemText: {
     fontSize: 16,
     fontWeight: '600',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
   },
   optionItemTextDanger: {
     color: theme.colors.danger,
   },
   optionDivider: {
-    height: 1,
+    height: verticalScale(1),
     backgroundColor: theme.colors.border,
   },
   
@@ -853,16 +882,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   fab: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: scale(64),
+    height: scale(64),
+    borderRadius: scale(32),
     backgroundColor: '#FF6B35',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#FF6B35',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.4,
-    shadowRadius: 8,
+    shadowRadius: scale(8),
     elevation: 8,
   },
   
@@ -886,7 +915,7 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 16,
     fontWeight: '700',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
     marginTop: theme.spacing.md,
     textAlign: 'center',
     letterSpacing: 1,

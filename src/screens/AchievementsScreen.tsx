@@ -15,6 +15,7 @@ import { HudContainer } from '../components/ui/HudContainer';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { StatBar } from '../components/ui/StatBar';
 import { theme } from '../constants/theme';
+import { scale, verticalScale, fontSize as fs, lineHeight } from '../utils/responsive';
 import { Trophy, Lock, Crown, Flame, Star, Target, Award, TrendingUp } from 'lucide-react-native';
 
 export function AchievementsScreen() {
@@ -310,14 +311,14 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   rankIcon: {
-    fontSize: 48,
+    fontSize: fs(48),
     marginRight: theme.spacing.lg,
   },
   rankInfo: {
     flex: 1,
   },
   rankName: {
-    fontSize: 24,
+    fontSize: fs(24),
     fontWeight: '900',
     color: theme.colors.text.primary,
     letterSpacing: 2,
@@ -325,7 +326,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.heading,
   },
   rankDescription: {
-    fontSize: 14,
+    fontSize: fs(14),
     color: theme.colors.text.secondary,
   },
   nextRankInfo: {
@@ -335,12 +336,12 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.md,
   },
   nextRankText: {
-    fontSize: 12,
+    fontSize: fs(12),
     color: theme.colors.text.secondary,
     fontWeight: '600',
   },
   nextRankIcon: {
-    fontSize: 20,
+    fontSize: fs(20),
   },
   benefitsContainer: {
     marginTop: theme.spacing.lg,
@@ -349,7 +350,7 @@ const styles = StyleSheet.create({
     borderTopColor: theme.colors.bg.glassBorder,
   },
   benefitsTitle: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '700',
     color: theme.colors.text.secondary,
     marginBottom: theme.spacing.sm,
@@ -361,7 +362,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xs,
   },
   benefitText: {
-    fontSize: 13,
+    fontSize: fs(13),
     color: theme.colors.text.primary,
     marginLeft: theme.spacing.sm,
   },
@@ -376,14 +377,14 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
   },
   statLabel: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '700',
     color: theme.colors.text.secondary,
     marginBottom: theme.spacing.xs,
     letterSpacing: 1,
   },
   statValue: {
-    fontSize: 20,
+    fontSize: fs(20),
     fontWeight: '900',
     color: theme.colors.primary,
     fontFamily: theme.fonts.heading,
@@ -409,7 +410,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.primary,
   },
   categoryButtonText: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '700',
     color: theme.colors.text.secondary,
   },
@@ -427,7 +428,7 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '800',
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.lg,
@@ -462,14 +463,14 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
   },
   achievementIcon: {
-    fontSize: 32,
+    fontSize: fs(32),
     marginRight: theme.spacing.sm,
   },
   achievementBadge: {
     marginLeft: 'auto',
   },
   achievementName: {
-    fontSize: 13,
+    fontSize: fs(13),
     fontWeight: '800',
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.xs,
@@ -478,17 +479,17 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
   },
   achievementDescription: {
-    fontSize: 11,
+    fontSize: fs(11),
     color: theme.colors.text.secondary,
     marginBottom: theme.spacing.sm,
-    lineHeight: 14,
+    lineHeight: lineHeight(fs(11)),
   },
   achievementReward: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   achievementRewardText: {
-    fontSize: 11,
+    fontSize: fs(11),
     fontWeight: '700',
     color: theme.colors.secondary,
     marginLeft: theme.spacing.xs,
@@ -504,9 +505,9 @@ const styles = StyleSheet.create({
     borderBottomColor: theme.colors.bg.glassBorder,
   },
   milestoneIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: scale(44),
+    height: scale(44),
+    borderRadius: scale(22),
     backgroundColor: theme.colors.bg.glass,
     justifyContent: 'center',
     alignItems: 'center',
@@ -516,13 +517,13 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.success + '20',
   },
   milestoneEmoji: {
-    fontSize: 20,
+    fontSize: fs(20),
   },
   milestoneInfo: {
     flex: 1,
   },
   milestoneName: {
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '700',
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.xs,
@@ -531,12 +532,12 @@ const styles = StyleSheet.create({
     color: theme.colors.success,
   },
   milestoneDescription: {
-    fontSize: 12,
+    fontSize: fs(12),
     color: theme.colors.text.secondary,
     marginBottom: theme.spacing.xs,
   },
   milestoneDate: {
-    fontSize: 10,
+    fontSize: fs(10),
     color: theme.colors.text.secondary,
   },
   spacer: {
